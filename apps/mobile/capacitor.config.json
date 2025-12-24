@@ -1,0 +1,13 @@
+{
+  "appId": "com.30plants.week",
+  "appName": "30 Plants A Week",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    }
+  }
+}

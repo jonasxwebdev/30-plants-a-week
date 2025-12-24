@@ -1,0 +1,65 @@
+---
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>30 Plants A Week</title>
+    <meta name="description" content="Track your plant-based eating journey" />
+    <style>
+      /* Mobile-optimized styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>🌱 30 Plants A Week</h1>
+      <p>Mobile app - Track your plants on the go!</p>
+      <div id="app"></div>
+    </main>
+
+    <script>
+      // Initialize Capacitor when ready
+      import { Capacitor } from '@capacitor/core';
+      import { PushNotifications } from '@capacitor/push-notifications';
+
+      if (Capacitor.isNativePlatform()) {
+        // Request permissions for push notifications
+        PushNotifications.requestPermissions().then(result => {
+          if (result.receive === 'granted') {
+            PushNotifications.register();
+          }
+        });
+
+        // Handle push notification registration
+        PushNotifications.addListener('registration', (token) => {
+          console.log('Push registration success, token: ' + token.value);
+          // TODO: Send token to backend
+        });
+
+        PushNotifications.addListener('registrationError', (error) => {
+          console.error('Error on registration: ' + JSON.stringify(error));
+        });
+
+        PushNotifications.addListener('pushNotificationReceived', (notification) => {
+          console.log('Push received: ' + JSON.stringify(notification));
+        });
+
+        PushNotifications.addListener('pushNotificationActionPerformed', (notification) => {
+          console.log('Push action performed: ' + JSON.stringify(notification));
+        });
+      }
+    </script>
+  </body>
+</html>

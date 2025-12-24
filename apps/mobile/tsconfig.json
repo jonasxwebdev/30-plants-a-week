@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "astro",
+    "types": ["@capacitor/core"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "ios", "android"]
+}
