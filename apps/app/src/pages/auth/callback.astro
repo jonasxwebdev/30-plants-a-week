@@ -1,0 +1,62 @@
+---
+import { createServerClient } from '../../lib/supabase';
+
+const supabase = createServerClient(Astro.cookies, Astro.request.headers);
+
+// Handle the callback - supports both OAuth and Magic Link flows
+const code = Astro.url.searchParams.get('code');
+const tokenHash = Astro.url.searchParams.get('token_hash');
+const type = Astro.url.searchParams.get('type');
+const error = Astro.url.searchParams.get('error');
+const errorDescription = Astro.url.searchParams.get('error_description');
+
+if (error) {
+  console.error('Auth error:', error, errorDescription);
+  return Astro.redirect(
+    '/signin?error=' + encodeURIComponent(errorDescription || 'Authentication failed')
+  );
+}
+
+try {
+  let session;
+
+  // Handle Magic Link callback (token_hash)
+  if (tokenHash && type) {
+    const { data, error: verifyError } = await supabase.auth.verifyOtp({
+      token_hash: tokenHash,
+      type: type as any,
+    });
+
+    if (verifyError || !data.session) {
+      console.error('Magic link verification error:', verifyError);
+      return Astro.redirect('/signin?error=' + encodeURIComponent('Failed to verify magic link'));
+    }
+
+    session = data.session;
+  }
+  // Handle OAuth callback (code)
+  else if (code) {
+    const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (exchangeError || !data.session) {
+      console.error('Code exchange error:', exchangeError);
+      return Astro.redirect('/signin?error=' + encodeURIComponent('Failed to authenticate'));
+    }
+
+    session = data.session;
+  }
+  // No valid parameters
+  else {
+    return Astro.redirect(
+      '/signin?error=' + encodeURIComponent('No authorization code or token provided')
+    );
+  }
+
+  // Session is automatically stored in cookies by createServerClient
+  // Redirect to the app dashboard
+  return Astro.redirect('/');
+} catch (err) {
+  console.error('Unexpected auth error:', err);
+  return Astro.redirect('/signin?error=' + encodeURIComponent('An unexpected error occurred'));
+}
+---

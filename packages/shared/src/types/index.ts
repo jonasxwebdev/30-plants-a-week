@@ -2,49 +2,121 @@
  * Shared types and interfaces for the 30 Plants A Week app
  */
 
+// ============================================================================
+// DATABASE TYPES (matching SQL schema)
+// ============================================================================
+
 export interface Plant {
   id: string;
   name: string;
-  category: PlantCategory;
-  description?: string;
-  created_at: string;
-}
-
-export enum PlantCategory {
-  VEGETABLE = 'vegetable',
-  FRUIT = 'fruit',
-  LEGUME = 'legume',
-  GRAIN = 'grain',
-  NUT = 'nut',
-  SEED = 'seed',
-  HERB = 'herb',
-  SPICE = 'spice',
-}
-
-export interface UserProfile {
-  id: string;
-  email: string;
-  full_name?: string;
-  avatar_url?: string;
+  normalized_name: string;
+  emoji?: string | null;
+  category?: string | null;
+  description?: string | null;
   created_at: string;
   updated_at: string;
 }
 
-export interface WeeklyLog {
+export interface PlantAlias {
+  id: string;
+  plant_id: string;
+  alias: string;
+  normalized_alias: string;
+  created_at: string;
+}
+
+export interface Profile {
+  id: string;
+  email?: string | null;
+  full_name?: string | null;
+  avatar_url?: string | null;
+  weekly_goal: number;
+  week_start_day: number; // 0=Sunday, 1=Monday
+  timezone: string;
+  notification_enabled: boolean;
+  notification_time: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Week {
   id: string;
   user_id: string;
-  plant_id: string;
-  week_start: string; // ISO date string (Monday)
-  count: number;
-  notes?: string;
+  week_start: string; // DATE (YYYY-MM-DD)
+  week_end: string; // DATE (YYYY-MM-DD)
+  goal: number;
+  notes?: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface WeekPlant {
+  id: string;
+  week_id: string;
+  plant_id: string;
+  logged_at: string;
+  quantity: number;
+  notes?: string | null;
+}
+
+export interface PushDevice {
+  id: string;
+  user_id: string;
+  device_token: string;
+  device_type: 'ios' | 'android' | 'web';
+  device_name?: string | null;
+  last_used_at: string;
+  created_at: string;
+}
+
+// ============================================================================
+// VIEW TYPES (for UI consumption)
+// ============================================================================
+
+export interface WeekWithPlants extends Week {
+  plants: PlantWithDetails[];
+  unique_count: number;
+  completed: boolean;
+}
+
+export interface PlantWithDetails extends Plant {
+  logged_at?: string;
+  quantity?: number;
+  notes?: string | null;
+}
+
+export interface AutocompleteResult {
+  plant: Plant;
+  match_type: 'name' | 'alias';
+  match_text: string;
 }
 
 export interface WeeklyProgress {
   week_start: string;
-  unique_plants: number;
-  total_servings: number;
+  week_end: string;
   goal: number;
+  unique_count: number;
   percentage: number;
+  completed: boolean;
+}
+
+export interface StreakInfo {
+  current_streak: number;
+  best_streak: number;
+  last_completed_week?: string;
+}
+
+// ============================================================================
+// FORM TYPES
+// ============================================================================
+
+export interface AddPlantInput {
+  plant_id: string;
+  quantity?: number;
+  notes?: string;
+}
+
+export interface UpdateGoalInput {
+  weekly_goal: number;
+  apply_to_current_week?: boolean;
 }

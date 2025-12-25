@@ -1,6 +1,6 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
-import Dashboard from '../components/Dashboard.vue';
+import Journal from '../components/Journal.vue';
 import { requireAuth } from '../lib/auth';
 
 const { redirect } = await requireAuth(Astro.cookies, Astro.request.headers);
@@ -10,6 +10,6 @@ if (redirect) {
 }
 ---
 
-<MainLayout title="Tracker" activeRoute="/">
-  <Dashboard client:load />
+<MainLayout title="Journal" activeRoute="/history">
+  <Journal client:load />
 </MainLayout>

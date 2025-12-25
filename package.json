@@ -6,15 +6,21 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "dev": "pnpm --parallel --filter \"./apps/*\" dev",
-    "build": "pnpm --filter \"./apps/*\" build",
+    "dev": "npm run dev --workspace=apps/landing & npm run dev --workspace=apps/app",
+    "dev:app": "npm run dev --workspace=apps/app",
+    "dev:landing": "npm run dev --workspace=apps/landing",
+    "build": "npm run build --workspaces --if-present",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.astro",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx,.astro --fix",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,astro,json,css,md}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,astro,json,css,md}\"",
-    "test": "pnpm --filter \"./apps/*\" --filter \"./packages/*\" test",
-    "clean": "pnpm --parallel --filter \"./apps/*\" --filter \"./packages/*\" clean"
+    "test": "npm run test --workspaces --if-present",
+    "clean": "npm run clean --workspaces --if-present"
   },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",

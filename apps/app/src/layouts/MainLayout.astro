@@ -1,149 +1,108 @@
 ---
+import GlobalAddPlant from '../components/GlobalAddPlant.vue';
+
 interface Props {
   title: string;
   description?: string;
+  activeRoute?: string;
 }
 
-const { title, description = "Track your plant-based eating journey" } = Astro.props;
-const currentPath = Astro.url.pathname;
+const {
+  title,
+  description = 'Verfolge deine pflanzenbasierte Ernährung',
+  activeRoute,
+} = Astro.props;
+const currentPath = activeRoute || Astro.url.pathname;
 ---
 
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="de">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title} - 30 Plants A Week</title>
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#10b981" />
-    <style is:global>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      :root {
-        --primary: #10b981;
-        --primary-dark: #059669;
-        --bg: #ffffff;
-        --surface: #f9fafb;
-        --text: #111827;
-        --text-secondary: #6b7280;
-        --border: #e5e7eb;
-        --error: #ef4444;
-        --success: #10b981;
-      }
-
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --bg: #111827;
-          --surface: #1f2937;
-          --text: #f9fafb;
-          --text-secondary: #9ca3af;
-          --border: #374151;
-        }
-      }
-
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        background: var(--bg);
-        color: var(--text);
-        line-height: 1.6;
-        padding-bottom: 80px; /* Space for bottom nav */
-      }
-
-      main {
-        max-width: 640px;
-        margin: 0 auto;
-        padding: 1rem;
-        min-height: calc(100vh - 80px);
-      }
-
-      button {
-        font: inherit;
-        cursor: pointer;
-      }
-
-      a {
-        color: var(--primary);
-        text-decoration: none;
-      }
-
-      a:hover {
-        text-decoration: underline;
-      }
-    </style>
+    <meta name="theme-color" content="#059669" />
   </head>
-  <body>
-    <main>
+  <body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-50 pb-24">
+    <main class="max-w-md mx-auto px-4 py-6 min-h-[calc(100vh-5rem)]">
       <slot />
     </main>
 
+    <GlobalAddPlant client:load />
+
     <!-- Bottom Navigation -->
-    <nav class="bottom-nav">
-      <a href="/" class={currentPath === "/" ? "active" : ""}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+    <nav
+      class="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 flex justify-around py-3 z-30 pb-safe"
+    >
+      <a
+        href="/"
+        class={`flex flex-col items-center gap-1 px-4 py-1 text-[10px] font-medium transition-colors ${
+          currentPath === '/'
+            ? 'text-primary-600 dark:text-primary-400'
+            : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+        }`}
+      >
+        <svg
+          class="w-6 h-6"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
         </svg>
-        <span>Today</span>
+        <span>Tracker</span>
       </a>
-      <a href="/history" class={currentPath === "/history" ? "active" : ""}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-          <line x1="16" y1="2" x2="16" y2="6" />
-          <line x1="8" y1="2" x2="8" y2="6" />
-          <line x1="3" y1="10" x2="21" y2="10" />
+      <a
+        href="/history"
+        class={`flex flex-col items-center gap-1 px-4 py-1 text-[10px] font-medium transition-colors ${
+          currentPath === '/history'
+            ? 'text-primary-600 dark:text-primary-400'
+            : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+        }`}
+      >
+        <svg
+          class="w-6 h-6"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
         </svg>
-        <span>History</span>
+        <span>Journal</span>
       </a>
-      <a href="/settings" class={currentPath === "/settings" ? "active" : ""}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="3" />
-          <path d="M12 1v6m0 6v6m8.66-12l-5.2 3M8.54 14l-5.2 3m13.32 0l-5.2-3M8.54 10l-5.2-3" />
+      <a
+        href="/settings"
+        class={`flex flex-col items-center gap-1 px-4 py-1 text-[10px] font-medium transition-colors ${
+          currentPath === '/settings'
+            ? 'text-primary-600 dark:text-primary-400'
+            : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+        }`}
+      >
+        <svg
+          class="w-6 h-6"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+          ></path>
+          <circle cx="12" cy="12" r="3"></circle>
         </svg>
-        <span>Settings</span>
+        <span>Einstellungen</span>
       </a>
     </nav>
-
-    <style>
-      .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: var(--surface);
-        border-top: 1px solid var(--border);
-        display: flex;
-        justify-content: space-around;
-        padding: 0.5rem 0;
-        z-index: 100;
-      }
-
-      .bottom-nav a {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.25rem;
-        color: var(--text-secondary);
-        font-size: 0.75rem;
-        padding: 0.5rem 1rem;
-        transition: color 0.2s;
-      }
-
-      .bottom-nav a:hover {
-        text-decoration: none;
-        color: var(--text);
-      }
-
-      .bottom-nav a.active {
-        color: var(--primary);
-      }
-
-      .bottom-nav svg {
-        width: 24px;
-        height: 24px;
-      }
-    </style>
   </body>
 </html>
