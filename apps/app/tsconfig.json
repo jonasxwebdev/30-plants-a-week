@@ -1,8 +1,12 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "astro"
+    "jsxImportSource": "astro",
+    "baseUrl": ".",
+    "paths": {
+      "@30-plants/shared/*": ["../../packages/shared/src/*"]
+    }
   },
   "include": ["src/**/*", "api/**/*"],
   "exclude": ["node_modules", "dist"]
