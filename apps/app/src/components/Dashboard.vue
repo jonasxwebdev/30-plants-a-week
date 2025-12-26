@@ -81,14 +81,9 @@
             }"
           >
             <div class="flex items-center gap-3">
-              <motion.span
-                class="text-xl"
-                :initial="{ scale: 0 }"
-                :animate="{ scale: 1 }"
-                :transition="{ delay: index * 0.05 + 0.1, type: 'spring' }"
-              >
+              <span class="text-xl">
                 {{ plant.emoji || '🌱' }}
-              </motion.span>
+              </span>
               <div>
                 <p class="text-sm font-medium text-text">{{ plant.name }}</p>
                 <p class="text-[10px] text-gray-500">

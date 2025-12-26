@@ -40,10 +40,10 @@
               class="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
             />
             <label for="apply-current" class="flex-1 cursor-pointer">
-              <span class="block text-sm font-medium text-slate-900 dark:text-white"
+              <span class="block text-sm font-medium text-slate-900"
                 >Auf aktuelle Woche anwenden</span
               >
-              <span class="block text-xs text-slate-500 dark:text-slate-400">
+              <span class="block text-xs text-slate-500">
                 Ändere dein Ziel für diese Woche sofort.
               </span>
             </label>
