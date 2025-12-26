@@ -1,13 +1,13 @@
 <template>
   <div class="space-y-6 pb-24">
     <div>
-      <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Tagebuch</h1>
-      <p class="text-sm text-slate-500 dark:text-slate-400">Deine wöchentlichen Erfolge</p>
+      <h1 class="text-2xl font-bold text-text">Tagebuch</h1>
+      <p class="text-sm text-gray-500">Deine wöchentlichen Erfolge</p>
     </div>
 
-    <div v-if="isLoading" class="py-12 text-center text-slate-500">Verlauf wird geladen...</div>
+    <div v-if="isLoading" class="py-12 text-center text-gray-500">Verlauf wird geladen...</div>
 
-    <div v-else-if="weeks.length === 0" class="py-12 text-center text-slate-500">
+    <div v-else-if="weeks.length === 0" class="py-12 text-center text-gray-500">
       Noch kein Verlauf. Starte diese Woche!
     </div>
 
@@ -15,17 +15,17 @@
       <div
         v-for="week in weeks"
         :key="week.id"
-        class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all dark:border-slate-700 dark:bg-slate-800"
+        class="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all"
       >
         <button
           @click="toggleWeek(week.id)"
           class="flex w-full items-center justify-between p-4 text-left focus:outline-none"
         >
           <div>
-            <p class="font-medium text-slate-900 dark:text-white">
+            <p class="font-medium text-text">
               {{ formatWeekRange(week.week_start) }}
             </p>
-            <p class="text-xs text-slate-500 dark:text-slate-400">
+            <p class="text-xs text-gray-500">
               {{ isCurrentWeek(week.week_start) ? 'Aktuelle Woche' : '' }}
             </p>
           </div>
@@ -33,14 +33,14 @@
           <div class="flex items-center gap-3">
             <div
               class="flex items-center gap-1 rounded-full px-3 py-1 text-sm font-bold"
-              :class="getScoreClass(week.plant_count, week.goal)"
+              :class="getScoreClass(week.unique_count, week.goal)"
             >
-              <span>{{ week.plant_count }}</span>
+              <span>{{ week.unique_count }}</span>
               <span class="opacity-50">/</span>
               <span>{{ week.goal }}</span>
             </div>
             <svg
-              class="h-5 w-5 text-slate-400 transition-transform duration-200"
+              class="h-5 w-5 text-gray-400 transition-transform duration-200"
               :class="{ 'rotate-180': expandedWeekId === week.id }"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -56,21 +56,27 @@
         </button>
 
         <!-- Expanded Details -->
-        <div
-          v-if="expandedWeekId === week.id"
-          class="border-t border-slate-100 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800/50"
-        >
-          <div v-if="week.plants && week.plants.length > 0" class="flex flex-wrap gap-2">
-            <span
-              v-for="plant in week.plants"
-              :key="plant.id"
-              class="inline-flex items-center gap-1 rounded-full bg-white px-2 py-1 text-xs text-slate-700 shadow-sm dark:bg-slate-700 dark:text-slate-200"
-            >
-              {{ plant.emoji || '🌱' }} {{ plant.name }}
-            </span>
-          </div>
-          <p v-else class="text-sm text-slate-500">Keine Pflanzen eingetragen.</p>
-        </div>
+        <AnimatePresence>
+          <motion.div
+            v-if="expandedWeekId === week.id"
+            class="border-t border-gray-100 bg-gray-50 px-4 py-3 overflow-hidden"
+            :initial="{ height: 0, opacity: 0 }"
+            :animate="{ height: 'auto', opacity: 1 }"
+            :exit="{ height: 0, opacity: 0 }"
+            :transition="{ duration: 0.3, ease: 'easeInOut' }"
+          >
+            <div v-if="week.plants && week.plants.length > 0" class="flex flex-wrap gap-2">
+              <span
+                v-for="plant in week.plants"
+                :key="plant.id"
+                class="inline-flex items-center gap-1 rounded-full bg-white px-2 py-1 text-xs text-gray-700 shadow-sm border border-gray-100"
+              >
+                {{ plant.emoji || '🌱' }} {{ plant.name }}
+              </span>
+            </div>
+            <p v-else class="text-sm text-gray-500">Keine Pflanzen eingetragen.</p>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   </div>
@@ -78,12 +84,14 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { motion, AnimatePresence } from 'motion-v';
 import { createBrowserClient } from '../lib/supabase';
 import { getRecentWeeks } from '../lib/db';
 import { formatWeekRange, isCurrentWeek } from '@30-plants/shared/utils';
 import type { WeekWithPlants } from '@30-plants/shared/types';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
-let supabase: any = null;
+let supabase: SupabaseClient | null = null;
 const weeks = ref<WeekWithPlants[]>([]);
 const isLoading = ref(true);
 const expandedWeekId = ref<string | null>(null);
@@ -110,11 +118,11 @@ const toggleWeek = (id: string) => {
 
 const getScoreClass = (count: number, goal: number) => {
   if (count >= goal) {
-    return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400';
+    return 'bg-primary/10 text-primary';
   } else if (count >= goal * 0.5) {
-    return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
+    return 'bg-yellow-100 text-yellow-700';
   } else {
-    return 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300';
+    return 'bg-gray-100 text-gray-700';
   }
 };
 

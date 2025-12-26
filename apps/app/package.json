@@ -16,6 +16,8 @@
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.39.3",
     "astro": "^5.0.0",
+    "motion": "^12.23.26",
+    "motion-v": "^1.7.4",
     "vue": "^3.5.26"
   },
   "devDependencies": {

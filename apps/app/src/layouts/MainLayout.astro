@@ -1,5 +1,6 @@
 ---
 import GlobalAddPlant from '../components/GlobalAddPlant.vue';
+import '../styles/global.css';
 
 interface Props {
   title: string;
@@ -22,9 +23,9 @@ const currentPath = activeRoute || Astro.url.pathname;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title} - 30 Plants A Week</title>
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#059669" />
+    <meta name="theme-color" content="#62c16e" />
   </head>
-  <body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-50 pb-24">
+  <body class="bg-background text-text pb-24">
     <main class="max-w-md mx-auto px-4 py-6 min-h-[calc(100vh-5rem)]">
       <slot />
     </main>
@@ -33,14 +34,12 @@ const currentPath = activeRoute || Astro.url.pathname;
 
     <!-- Bottom Navigation -->
     <nav
-      class="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 flex justify-around py-3 z-30 pb-safe"
+      class="fixed bottom-6 left-4 right-4 bg-white/90 backdrop-blur-lg border border-white/20 shadow-float rounded-3xl flex justify-around py-3 z-30"
     >
       <a
         href="/"
         class={`flex flex-col items-center gap-1 px-4 py-1 text-[10px] font-medium transition-colors ${
-          currentPath === '/'
-            ? 'text-primary-600 dark:text-primary-400'
-            : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+          currentPath === '/' ? 'text-primary' : 'text-gray-400 hover:text-text'
         }`}
       >
         <svg
@@ -60,9 +59,7 @@ const currentPath = activeRoute || Astro.url.pathname;
       <a
         href="/history"
         class={`flex flex-col items-center gap-1 px-4 py-1 text-[10px] font-medium transition-colors ${
-          currentPath === '/history'
-            ? 'text-primary-600 dark:text-primary-400'
-            : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+          currentPath === '/history' ? 'text-primary' : 'text-gray-400 hover:text-text'
         }`}
       >
         <svg
@@ -82,9 +79,7 @@ const currentPath = activeRoute || Astro.url.pathname;
       <a
         href="/settings"
         class={`flex flex-col items-center gap-1 px-4 py-1 text-[10px] font-medium transition-colors ${
-          currentPath === '/settings'
-            ? 'text-primary-600 dark:text-primary-400'
-            : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+          currentPath === '/settings' ? 'text-primary' : 'text-gray-400 hover:text-text'
         }`}
       >
         <svg

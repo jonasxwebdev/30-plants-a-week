@@ -1,5 +1,6 @@
 ---
 import Auth from '../components/Auth.vue';
+import '../styles/global.css';
 ---
 
 <!doctype html>
@@ -9,7 +10,7 @@ import Auth from '../components/Auth.vue';
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sign In - 30 Plants a Week</title>
     <meta name="description" content="Sign in to track your plant diversity journey" />
-    <meta name="theme-color" content="#059669" />
+    <meta name="theme-color" content="#62c16e" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -18,7 +19,7 @@ import Auth from '../components/Auth.vue';
       rel="stylesheet"
     />
   </head>
-  <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white antialiased">
+  <body class="bg-background text-text antialiased">
     <Auth client:load />
   </body>
 </html>

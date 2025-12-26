@@ -4,26 +4,30 @@ export default {
   theme: {
     extend: {
       colors: {
+        background: 'rgb(var(--color-background) / <alpha-value>)',
+        text: 'rgb(var(--color-text) / <alpha-value>)',
         primary: {
-          DEFAULT: '#059669', // emerald-600
-          50: '#ecfdf5',
-          100: '#d1fae5',
-          200: '#a7f3d0',
-          300: '#6ee7b7',
-          400: '#34d399',
-          500: '#10b981',
-          600: '#059669',
-          700: '#047857',
-          800: '#065f46',
-          900: '#064e3b',
+          DEFAULT: 'rgb(var(--color-primary) / <alpha-value>)',
+          foreground: '#ffffff',
         },
         secondary: {
-          DEFAULT: '#84cc16', // lime-500
-          500: '#84cc16',
+          DEFAULT: 'rgb(var(--color-secondary) / <alpha-value>)',
+          foreground: '#ffffff',
         },
+      },
+      borderRadius: {
+        lg: 'var(--radius-lg)',
+        md: 'var(--radius-md)',
+        sm: 'var(--radius-sm)',
+        '3xl': '1.5rem',
+        '4xl': '2rem',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      boxShadow: {
+        float: '0 10px 30px -10px rgba(0, 0, 0, 0.1)',
+        glow: '0 0 20px -5px var(--color-primary)',
       },
     },
   },

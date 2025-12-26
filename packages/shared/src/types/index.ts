@@ -76,6 +76,7 @@ export interface PushDevice {
 export interface WeekWithPlants extends Week {
   plants: PlantWithDetails[];
   unique_count: number;
+  percentage: number;
   completed: boolean;
 }
 

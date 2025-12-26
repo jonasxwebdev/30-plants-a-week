@@ -135,12 +135,14 @@ export async function getRecentWeeks(
     (weeks as Week[]).map(async (week) => {
       const plants = await listWeekPlants(supabase, week.id);
       const uniqueCount = plants.length;
+      const percentage = calculateProgress(uniqueCount, week.goal);
       const completed = isWeekCompleted(week.week_end) && uniqueCount >= week.goal;
 
       return {
         ...week,
         plants,
         unique_count: uniqueCount,
+        percentage,
         completed,
       } as WeekWithPlants;
     })
@@ -349,6 +351,123 @@ export async function searchPlants(
   });
 
   return results;
+}
+
+/**
+ * Check if a plant name exists as an exact match
+ */
+export async function checkExactPlantMatch(
+  supabase: SupabaseClient,
+  query: string
+): Promise<boolean> {
+  const normalizedQuery = query.toLowerCase().trim();
+
+  // Check exact match in plants table
+  const { data: plantMatch, error: plantError } = await supabase
+    .from('plants')
+    .select('id')
+    .eq('normalized_name', normalizedQuery)
+    .single();
+
+  if (!plantError && plantMatch) return true;
+
+  // Check exact match in aliases table
+  const { data: aliasMatch, error: aliasError } = await supabase
+    .from('plant_aliases')
+    .select('plant_id')
+    .ilike('alias', normalizedQuery)
+    .single();
+
+  return !aliasError && !!aliasMatch;
+}
+
+/**
+ * Get user's custom plants
+ */
+export async function getUserCustomPlants(
+  supabase: SupabaseClient,
+  userId: string,
+  limit: number = 20
+): Promise<Plant[]> {
+  const { data, error } = await supabase
+    .from('plants')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+  return data as Plant[];
+}
+
+/**
+ * Get recommended plants from previous weeks that aren't in current week
+ */
+export async function getRecommendedPlants(
+  supabase: SupabaseClient,
+  userId: string,
+  limit: number = 10
+): Promise<Plant[]> {
+  const profile = await getProfile(supabase, userId);
+  const currentWeekStart = getWeekStartDate(profile.timezone);
+
+  // Get current week
+  const currentWeek = await getWeek(supabase, userId, currentWeekStart);
+  if (!currentWeek) return [];
+
+  // Get plants from current week
+  const currentWeekPlants = await listWeekPlants(supabase, currentWeek.id);
+  const currentPlantIds = new Set(currentWeekPlants.map((p) => p.id));
+
+  // Get last 3 weeks (excluding current)
+  const { data: pastWeeks, error: weeksError } = await supabase
+    .from('weeks')
+    .select('id')
+    .eq('user_id', userId)
+    .lt('week_start', currentWeekStart)
+    .order('week_start', { ascending: false })
+    .limit(3);
+
+  if (weeksError || !pastWeeks || pastWeeks.length === 0) return [];
+
+  const pastWeekIds = pastWeeks.map((w) => w.id);
+
+  // Get plants from those weeks
+  const { data: weekPlants, error: plantsError } = await supabase
+    .from('week_plants')
+    .select(
+      `
+      plant:plant_id (
+        id,
+        name,
+        normalized_name,
+        emoji,
+        category,
+        description,
+        created_at,
+        updated_at,
+        user_id
+      )
+    `
+    )
+    .in('week_id', pastWeekIds);
+
+  if (plantsError || !weekPlants) return [];
+
+  // Filter out plants already in current week and deduplicate
+  const seenPlantIds = new Set<string>();
+  const recommendations: Plant[] = [];
+
+  for (const wp of weekPlants as any[]) {
+    if (wp.plant && !currentPlantIds.has(wp.plant.id) && !seenPlantIds.has(wp.plant.id)) {
+      seenPlantIds.add(wp.plant.id);
+      recommendations.push(wp.plant as Plant);
+
+      if (recommendations.length >= limit) break;
+    }
+  }
+
+  return recommendations;
 }
 
 /**

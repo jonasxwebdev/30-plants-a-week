@@ -3,12 +3,10 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Tracker</h1>
-        <p class="text-sm text-slate-500 dark:text-slate-400">{{ weekRange }}</p>
+        <h1 class="text-2xl font-bold text-text">Tracker</h1>
+        <p class="text-sm text-gray-500">{{ weekRange }}</p>
       </div>
-      <div
-        class="flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400"
-      >
+      <div class="flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1 text-orange-600">
         <span class="text-lg">🔥</span>
         <span class="font-bold">{{ streak }}</span>
       </div>
@@ -25,7 +23,7 @@
           stroke="currentColor"
           stroke-width="24"
           fill="none"
-          class="text-slate-100 dark:text-slate-800"
+          class="text-gray-100"
         />
         <!-- Progress Circle -->
         <circle
@@ -36,7 +34,7 @@
           stroke-width="24"
           fill="none"
           stroke-linecap="round"
-          class="text-primary-600 transition-all duration-1000 ease-out dark:text-primary-500"
+          class="text-primary transition-all duration-1000 ease-out"
           :stroke-dasharray="circumference"
           :stroke-dashoffset="dashOffset"
         />
@@ -44,11 +42,9 @@
 
       <!-- Center Content -->
       <div class="text-center">
-        <div class="text-5xl font-bold text-slate-900 dark:text-white">{{ uniqueCount }}</div>
-        <div class="text-sm font-medium text-slate-500 dark:text-slate-400">
-          von {{ goal }} Pflanzen
-        </div>
-        <div class="mt-2 text-xs font-medium text-primary-600 dark:text-primary-400">
+        <div class="text-5xl font-bold text-text">{{ uniqueCount }}</div>
+        <div class="text-sm font-medium text-gray-500">von {{ goal }} Pflanzen</div>
+        <div class="mt-2 text-xs font-medium text-primary">
           {{ plantsLeft > 0 ? `Noch ${plantsLeft}!` : 'Ziel erreicht! 🎉' }}
         </div>
       </div>
@@ -56,64 +52,130 @@
 
     <!-- Plant List -->
     <div>
-      <h2 class="mb-4 text-lg font-semibold text-slate-900 dark:text-white">
-        Pflanzen dieser Woche
-      </h2>
+      <h2 class="mb-4 text-lg font-semibold text-text">Pflanzen dieser Woche</h2>
 
-      <div v-if="isLoading" class="py-8 text-center text-slate-500">Laden...</div>
+      <div v-if="isLoading" class="py-8 text-center text-gray-500">Laden...</div>
 
       <div
         v-else-if="plants.length === 0"
-        class="flex flex-col items-center justify-center rounded-2xl bg-slate-50 py-12 text-center dark:bg-slate-800/50"
+        class="flex flex-col items-center justify-center rounded-3xl bg-gray-50 py-12 text-center"
       >
         <div class="mb-4 text-4xl opacity-50">🥗</div>
-        <h3 class="text-lg font-medium text-slate-900 dark:text-white">Schale leer?</h3>
-        <p class="text-sm text-slate-500 dark:text-slate-400">Füge deine erste Pflanze hinzu!</p>
+        <h3 class="text-lg font-medium text-text">Schale leer?</h3>
+        <p class="text-sm text-gray-500">Füge deine erste Pflanze hinzu!</p>
       </div>
 
-      <div v-else class="space-y-3">
-        <div
-          v-for="plant in plants"
-          :key="plant.id"
-          class="group flex items-center justify-between rounded-xl bg-white p-4 shadow-sm transition-all hover:shadow-md dark:bg-slate-800"
-        >
-          <div class="flex items-center gap-4">
-            <span class="text-2xl">{{ plant.emoji || '🌱' }}</span>
-            <div>
-              <p class="font-medium text-slate-900 dark:text-white">{{ plant.name }}</p>
-              <p class="text-xs text-slate-500 dark:text-slate-400">
-                {{ formatDate(plant.logged_at) }}
-              </p>
-            </div>
-          </div>
-
-          <button
-            @click="removePlant(plant.id)"
-            class="opacity-0 transition-opacity group-hover:opacity-100 p-2 text-slate-400 hover:text-red-500 focus:opacity-100"
-            aria-label="Pflanze entfernen"
+      <div v-else class="space-y-2">
+        <AnimatePresence>
+          <motion.div
+            v-for="(plant, index) in plants"
+            :key="plant.id"
+            class="group flex items-center justify-between rounded-xl bg-white p-3 shadow-sm border border-gray-100"
+            :initial="{ opacity: 0, y: 20 }"
+            :animate="{ opacity: 1, y: 0 }"
+            :exit="{ opacity: 0, scale: 0.95 }"
+            :transition="{ delay: index * 0.05 }"
+            :whileHover="{
+              y: -2,
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            }"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+            <div class="flex items-center gap-3">
+              <motion.span
+                class="text-xl"
+                :initial="{ scale: 0 }"
+                :animate="{ scale: 1 }"
+                :transition="{ delay: index * 0.05 + 0.1, type: 'spring' }"
+              >
+                {{ plant.emoji || '🌱' }}
+              </motion.span>
+              <div>
+                <p class="text-sm font-medium text-text">{{ plant.name }}</p>
+                <p class="text-[10px] text-gray-500">
+                  {{ formatDate(plant?.logged_at || '') }}
+                </p>
+              </div>
+            </div>
+
+            <motion.button
+              @click="openDeleteModal(plant)"
+              class="p-2 text-gray-400 hover:text-red-500"
+              :whileTap="{ scale: 0.9 }"
+              aria-label="Pflanze entfernen"
             >
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </motion.button>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <AnimatePresence>
+      <motion.div
+        v-if="showDeleteModal"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        :initial="{ opacity: 0 }"
+        :animate="{ opacity: 1 }"
+        :exit="{ opacity: 0 }"
+      >
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" @click="cancelDelete"></div>
+
+        <!-- Modal -->
+        <motion.div
+          class="relative w-full max-w-sm overflow-hidden rounded-3xl bg-white p-6 shadow-xl"
+          :initial="{ scale: 0.9, opacity: 0 }"
+          :animate="{ scale: 1, opacity: 1 }"
+          :exit="{ scale: 0.9, opacity: 0 }"
+        >
+          <div class="mb-6 text-center">
+            <div
+              class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-2xl"
+            >
+              🗑️
+            </div>
+            <h3 class="mb-2 text-lg font-bold text-text">Pflanze entfernen?</h3>
+            <p class="text-sm text-gray-500">
+              Möchtest du "{{ plantToDelete?.name }}" wirklich von deiner Liste entfernen?
+            </p>
+          </div>
+
+          <div class="flex gap-3">
+            <button
+              @click="cancelDelete"
+              class="flex-1 rounded-xl bg-gray-50 py-3 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-100"
+            >
+              Abbrechen
+            </button>
+            <button
+              @click="confirmDelete"
+              class="flex-1 rounded-xl bg-red-500 py-3 text-sm font-bold text-white shadow-lg shadow-red-200 transition-transform active:scale-95"
+            >
+              Entfernen
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { motion, AnimatePresence } from 'motion-v';
 import { createBrowserClient } from '../lib/supabase';
 import {
   ensureCurrentWeek,
@@ -130,6 +192,8 @@ const plants = ref<PlantWithDetails[]>([]);
 const currentWeek = ref<Week | null>(null);
 const streak = ref(0);
 const isLoading = ref(true);
+const showDeleteModal = ref(false);
+const plantToDelete = ref<PlantWithDetails | null>(null);
 
 // Ring calculations
 const radius = 110;
@@ -171,12 +235,23 @@ const loadData = async () => {
   }
 };
 
-const removePlant = async (plantId: string) => {
-  if (!currentWeek.value || !confirm('Remove this plant?')) return;
+const openDeleteModal = (plant: PlantWithDetails) => {
+  plantToDelete.value = plant;
+  showDeleteModal.value = true;
+};
+
+const cancelDelete = () => {
+  showDeleteModal.value = false;
+  plantToDelete.value = null;
+};
+
+const confirmDelete = async () => {
+  if (!currentWeek.value || !plantToDelete.value) return;
 
   try {
-    await removePlantFromWeek(supabase, currentWeek.value.id, plantId);
+    await removePlantFromWeek(supabase, currentWeek.value.id, plantToDelete.value.id);
     await loadData();
+    cancelDelete();
   } catch (error) {
     console.error('Error removing plant:', error);
   }

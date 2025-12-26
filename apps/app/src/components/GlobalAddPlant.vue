@@ -1,9 +1,11 @@
 <template>
   <div>
     <!-- FAB -->
-    <button
+    <motion.button
       @click="openModal"
-      class="fixed bottom-20 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary-600 text-white shadow-lg transition-transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+      class="fixed bottom-24 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/30 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+      :whileHover="{ scale: 1.05 }"
+      :whileTap="{ scale: 0.95 }"
       aria-label="Add Plant"
     >
       <svg
@@ -20,47 +22,36 @@
         <path d="M5 12h14" />
         <path d="M12 5v14" />
       </svg>
-    </button>
+    </motion.button>
 
     <!-- Modal Overlay -->
-    <Transition
-      enter-active-class="transition duration-200 ease-out"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition duration-150 ease-in"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
-    >
-      <div
+    <AnimatePresence>
+      <motion.div
         v-if="isOpen"
         class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
         @click="closeModal"
-      ></div>
-    </Transition>
+        :initial="{ opacity: 0 }"
+        :animate="{ opacity: 1 }"
+        :exit="{ opacity: 0 }"
+        :transition="{ duration: 0.2 }"
+      ></motion.div>
+    </AnimatePresence>
 
     <!-- Modal Content -->
-    <Transition
-      enter-active-class="transition duration-300 ease-out"
-      enter-from-class="translate-y-full"
-      enter-to-class="translate-y-0"
-      leave-active-class="transition duration-200 ease-in"
-      leave-from-class="translate-y-0"
-      leave-to-class="translate-y-full"
-    >
-      <div
+    <AnimatePresence>
+      <motion.div
         v-if="isOpen"
-        class="fixed inset-x-0 bottom-0 z-50 h-[90vh] rounded-t-2xl bg-white p-6 shadow-xl dark:bg-gray-800 flex flex-col"
+        class="fixed inset-x-0 bottom-0 z-50 h-[90vh] rounded-t-3xl bg-background p-6 shadow-xl flex flex-col"
+        :initial="{ y: '100%' }"
+        :animate="{ y: 0 }"
+        :exit="{ y: '100%' }"
+        :transition="{ type: 'spring', damping: 25, stiffness: 200 }"
       >
-        <div
-          class="mx-auto mb-6 h-1.5 w-12 rounded-full bg-gray-200 dark:bg-gray-700 shrink-0"
-        ></div>
+        <div class="mx-auto mb-6 h-1.5 w-12 rounded-full bg-gray-200 shrink-0"></div>
 
         <div class="flex items-center justify-between mb-6 shrink-0">
-          <h2 class="text-xl font-bold text-gray-900 dark:text-white">Pflanze hinzufügen</h2>
-          <button
-            @click="closeModal"
-            class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-          >
+          <h2 class="text-xl font-bold text-text">Pflanze hinzufügen</h2>
+          <button @click="closeModal" class="p-2 text-gray-500 hover:text-gray-700">
             Schließen
           </button>
         </div>
@@ -75,7 +66,7 @@
             @keydown.esc="closeModal"
             type="text"
             placeholder="Was hast du gegessen?"
-            class="w-full rounded-xl border-0 bg-gray-100 px-4 py-3 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+            class="w-full rounded-xl border-0 bg-gray-100 px-4 py-3 text-text placeholder-gray-500 focus:ring-2 focus:ring-primary"
           />
           <div v-if="isLoading" class="absolute right-3 top-3 text-gray-400">
             <svg
@@ -109,97 +100,200 @@
 
         <!-- Results List -->
         <div class="flex-1 overflow-y-auto -mx-6 px-6">
-          <div v-if="results.length > 0" class="space-y-2">
-            <button
-              v-for="(result, index) in results"
-              :key="index"
-              @click="selectPlant(result)"
-              class="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left group"
-            >
-              <span class="text-3xl">{{ result.plant.emoji || '🌱' }}</span>
-              <div class="flex-1 min-w-0">
-                <p
-                  class="font-medium text-gray-900 dark:text-white truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
-                >
-                  {{ result.plant.name }}
-                </p>
-                <p
-                  v-if="result.match_type === 'alias'"
-                  class="text-xs text-gray-500 dark:text-gray-400"
-                >
-                  auch bekannt als {{ result.match_text }}
-                </p>
-              </div>
-              <div
-                v-if="result.plant.category"
-                class="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-gray-600 dark:text-gray-400"
+          <div v-if="results.length > 0" class="space-y-4">
+            <div class="space-y-2">
+              <motion.button
+                v-for="(result, index) in results"
+                :key="index"
+                @click="selectPlant(result)"
+                class="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors text-left group"
+                :initial="{ opacity: 0, x: -20 }"
+                :animate="{ opacity: 1, x: 0 }"
+                :transition="{ delay: index * 0.05 }"
+                :whileHover="{ x: 4 }"
+                :whileTap="{ scale: 0.98 }"
               >
-                {{ result.plant.category }}
-              </div>
-            </button>
+                <span class="text-3xl">{{ result.plant.emoji || '🌱' }}</span>
+                <div class="flex-1 min-w-0">
+                  <p
+                    class="font-medium text-text truncate group-hover:text-primary transition-colors"
+                  >
+                    {{ result.plant.name }}
+                  </p>
+                  <p v-if="result.match_type === 'alias'" class="text-xs text-gray-500">
+                    auch bekannt als {{ result.match_text }}
+                  </p>
+                </div>
+                <div
+                  v-if="result.plant.category"
+                  class="text-xs px-2 py-1 bg-gray-100 rounded text-gray-600"
+                >
+                  {{ result.plant.category }}
+                </div>
+              </motion.button>
+            </div>
+
+            <!-- Show custom plant option if no exact match -->
+            <motion.div
+              v-if="!hasExactMatch && searchQuery.length >= 2"
+              class="pt-2 border-t border-gray-200"
+              :initial="{ opacity: 0, y: -10 }"
+              :animate="{ opacity: 1, y: 0 }"
+            >
+              <p class="text-xs text-gray-500 mb-2 px-1">Nicht gefunden?</p>
+              <motion.button
+                @click="addCustomPlant"
+                class="w-full flex items-center justify-center gap-3 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors border-2 border-dashed border-primary/30"
+                :whileHover="{ scale: 1.02 }"
+                :whileTap="{ scale: 0.98 }"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="text-primary"
+                >
+                  <path d="M5 12h14" />
+                  <path d="M12 5v14" />
+                </svg>
+                <span class="font-medium text-primary">
+                  "{{ searchQuery }}" als eigene Pflanze hinzufügen
+                </span>
+              </motion.button>
+            </motion.div>
           </div>
 
           <!-- Empty State / Suggestions -->
-          <div v-else-if="searchQuery.length < 2" class="space-y-6">
+          <motion.div
+            v-else-if="searchQuery.length < 2"
+            class="space-y-6"
+            :initial="{ opacity: 0 }"
+            :animate="{ opacity: 1 }"
+            :transition="{ duration: 0.3 }"
+          >
             <div class="text-center py-4">
-              <p class="text-sm text-gray-500 dark:text-gray-400">
-                Tippe zum Suchen oder wähle einen Vorschlag
-              </p>
+              <p class="text-sm text-gray-500">Tippe zum Suchen oder wähle einen Vorschlag</p>
             </div>
-            <div>
-              <h3 class="mb-3 text-sm font-medium text-gray-500 dark:text-gray-400">
-                Beliebte Pflanzen
-              </h3>
+
+            <!-- Recommended Plants from Previous Weeks -->
+            <div v-if="recommendedPlants.length > 0">
+              <h3 class="mb-3 text-sm font-medium text-gray-500">Aus letzten Wochen</h3>
               <div class="flex flex-wrap gap-2">
-                <button
-                  @click="quickAdd('Apfel')"
-                  class="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors"
+                <motion.button
+                  v-for="(plant, index) in recommendedPlants"
+                  :key="plant.id"
+                  @click="quickAddById(plant)"
+                  class="rounded-full bg-green-50 px-3 py-1.5 text-sm font-medium text-text hover:bg-green-100 transition-colors inline-flex items-center gap-1.5"
+                  :initial="{ opacity: 0, scale: 0.8 }"
+                  :animate="{ opacity: 1, scale: 1 }"
+                  :transition="{ delay: index * 0.03 }"
+                  :whileHover="{ scale: 1.05 }"
+                  :whileTap="{ scale: 0.95 }"
                 >
-                  🍎 Apfel
-                </button>
-                <button
-                  @click="quickAdd('Banane')"
-                  class="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors"
-                >
-                  🍌 Banane
-                </button>
-                <button
-                  @click="quickAdd('Spinat')"
-                  class="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors"
-                >
-                  🥬 Spinat
-                </button>
-                <button
-                  @click="quickAdd('Karotte')"
-                  class="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors"
-                >
-                  🥕 Karotte
-                </button>
-                <button
-                  @click="quickAdd('Brokkoli')"
-                  class="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors"
-                >
-                  🥦 Brokkoli
-                </button>
-                <button
-                  @click="quickAdd('Tomate')"
-                  class="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors"
-                >
-                  🍅 Tomate
-                </button>
+                  <span class="text-base">{{ plant.emoji || '🌱' }}</span>
+                  <span class="truncate max-w-[120px]">{{ plant.name }}</span>
+                </motion.button>
               </div>
             </div>
-          </div>
+
+            <!-- User's Custom Plants -->
+            <div v-if="userCustomPlants.length > 0">
+              <h3 class="mb-3 text-sm font-medium text-gray-500">Deine Pflanzen</h3>
+              <div class="flex flex-wrap gap-2">
+                <motion.button
+                  v-for="(plant, index) in userCustomPlants"
+                  :key="plant.id"
+                  @click="quickAddById(plant)"
+                  class="rounded-full bg-primary/5 px-3 py-1.5 text-sm font-medium text-text hover:bg-primary/10 transition-colors inline-flex items-center gap-1.5"
+                  :initial="{ opacity: 0, scale: 0.8 }"
+                  :animate="{ opacity: 1, scale: 1 }"
+                  :transition="{ delay: index * 0.03 }"
+                  :whileHover="{ scale: 1.05 }"
+                  :whileTap="{ scale: 0.95 }"
+                >
+                  <span class="text-base">{{ plant.emoji || '🌱' }}</span>
+                  <span class="truncate max-w-[120px]">{{ plant.name }}</span>
+                </motion.button>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="mb-3 text-sm font-medium text-gray-500">Beliebte Pflanzen</h3>
+              <div class="flex flex-wrap gap-2">
+                <motion.button
+                  @click="quickAdd('Apfel')"
+                  class="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+                  :whileHover="{ scale: 1.05, backgroundColor: '#e5e7eb' }"
+                  :whileTap="{ scale: 0.95 }"
+                >
+                  🍎 Apfel
+                </motion.button>
+                <motion.button
+                  @click="quickAdd('Banane')"
+                  class="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+                  :whileHover="{ scale: 1.05, backgroundColor: '#e5e7eb' }"
+                  :whileTap="{ scale: 0.95 }"
+                >
+                  🍌 Banane
+                </motion.button>
+                <motion.button
+                  @click="quickAdd('Spinat')"
+                  class="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+                  :whileHover="{ scale: 1.05, backgroundColor: '#e5e7eb' }"
+                  :whileTap="{ scale: 0.95 }"
+                >
+                  🥬 Spinat
+                </motion.button>
+                <motion.button
+                  @click="quickAdd('Karotte')"
+                  class="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+                  :whileHover="{ scale: 1.05, backgroundColor: '#e5e7eb' }"
+                  :whileTap="{ scale: 0.95 }"
+                >
+                  🥕 Karotte
+                </motion.button>
+                <motion.button
+                  @click="quickAdd('Brokkoli')"
+                  class="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+                  :whileHover="{ scale: 1.05, backgroundColor: '#e5e7eb' }"
+                  :whileTap="{ scale: 0.95 }"
+                >
+                  🥦 Brokkoli
+                </motion.button>
+                <motion.button
+                  @click="quickAdd('Tomate')"
+                  class="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+                  :whileHover="{ scale: 1.05, backgroundColor: '#e5e7eb' }"
+                  :whileTap="{ scale: 0.95 }"
+                >
+                  🍅 Tomate
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
 
           <!-- No Results - Allow Custom Plant -->
-          <div v-else-if="searchQuery.length >= 2" class="py-8">
+          <motion.div
+            v-else-if="searchQuery.length >= 2"
+            class="py-8"
+            :initial="{ opacity: 0 }"
+            :animate="{ opacity: 1 }"
+          >
             <div class="text-center mb-4">
-              <p class="text-gray-500 dark:text-gray-400 mb-2">Keine Treffer gefunden</p>
-              <p class="text-sm text-gray-400 dark:text-gray-500">Trotzdem hinzufügen?</p>
+              <p class="text-gray-500 mb-2">Keine Treffer gefunden</p>
+              <p class="text-sm text-gray-400">Trotzdem hinzufügen?</p>
             </div>
-            <button
+            <motion.button
               @click="addCustomPlant"
-              class="w-full flex items-center justify-center gap-3 p-4 rounded-xl bg-primary-50 hover:bg-primary-100 dark:bg-primary-900/20 dark:hover:bg-primary-900/30 transition-colors border-2 border-dashed border-primary-300 dark:border-primary-700"
+              class="w-full flex items-center justify-center gap-3 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors border-2 border-dashed border-primary/30"
+              :whileHover="{ scale: 1.02 }"
+              :whileTap="{ scale: 0.98 }"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -211,50 +305,50 @@
                 stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class="text-primary-600 dark:text-primary-400"
+                class="text-primary"
               >
                 <path d="M5 12h14" />
                 <path d="M12 5v14" />
               </svg>
-              <span class="font-medium text-primary-700 dark:text-primary-300">
+              <span class="font-medium text-primary">
                 "{{ searchQuery }}" als eigene Pflanze hinzufügen
               </span>
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
         </div>
-      </div>
-    </Transition>
+      </motion.div>
+    </AnimatePresence>
 
     <!-- Toast Notification -->
-    <Transition
-      enter-active-class="transition duration-300 ease-out"
-      enter-from-class="translate-y-20 opacity-0"
-      enter-to-class="translate-y-0 opacity-100"
-      leave-active-class="transition duration-200 ease-in"
-      leave-from-class="translate-y-0 opacity-100"
-      leave-to-class="translate-y-20 opacity-0"
-    >
-      <div
+    <AnimatePresence>
+      <motion.div
         v-if="toast.show"
         class="fixed bottom-24 left-4 right-4 z-50 flex items-center gap-3 rounded-xl p-4 shadow-lg"
-        :class="
-          toast.type === 'success'
-            ? 'bg-emerald-50 text-emerald-900 dark:bg-emerald-900/90 dark:text-emerald-100'
-            : 'bg-red-50 text-red-900 dark:bg-red-900/90 dark:text-red-100'
-        "
+        :class="toast.type === 'success' ? 'bg-primary/10 text-primary' : 'bg-red-50 text-red-900'"
+        :initial="{ opacity: 0, y: 20 }"
+        :animate="{ opacity: 1, y: 0 }"
+        :exit="{ opacity: 0, y: 20 }"
       >
         <span class="text-xl">{{ toast.type === 'success' ? '🎉' : '⚠️' }}</span>
         <p class="font-medium">{{ toast.message }}</p>
-      </div>
-    </Transition>
+      </motion.div>
+    </AnimatePresence>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, nextTick, onMounted } from 'vue';
+import { motion, AnimatePresence } from 'motion-v';
 import { createBrowserClient } from '../lib/supabase';
-import { searchPlants, addPlantToWeek, ensureCurrentWeek } from '../lib/db';
-import type { AutocompleteResult } from '@30-plants/shared/types';
+import {
+  searchPlants,
+  addPlantToWeek,
+  ensureCurrentWeek,
+  checkExactPlantMatch,
+  getUserCustomPlants,
+  getRecommendedPlants,
+} from '../lib/db';
+import type { AutocompleteResult, Plant } from '@30-plants/shared/types';
 
 let supabase: any = null;
 const isOpen = ref(false);
@@ -263,11 +357,15 @@ const results = ref<AutocompleteResult[]>([]);
 const isLoading = ref(false);
 const searchInput = ref<HTMLInputElement | null>(null);
 const toast = ref({ show: false, message: '', type: 'success' });
+const hasExactMatch = ref(false);
+const userCustomPlants = ref<Plant[]>([]);
+const recommendedPlants = ref<Plant[]>([]);
 
 let searchTimeout: ReturnType<typeof setTimeout>;
 
-const openModal = () => {
+const openModal = async () => {
   isOpen.value = true;
+  await Promise.all([loadUserCustomPlants(), loadRecommendedPlants()]);
   nextTick(() => {
     searchInput.value?.focus();
   });
@@ -277,12 +375,14 @@ const closeModal = () => {
   isOpen.value = false;
   searchQuery.value = '';
   results.value = [];
+  hasExactMatch.value = false;
 };
 
 const handleInput = () => {
   clearTimeout(searchTimeout);
   if (searchQuery.value.length < 2) {
     results.value = [];
+    hasExactMatch.value = false;
     return;
   }
 
@@ -290,6 +390,7 @@ const handleInput = () => {
   searchTimeout = setTimeout(async () => {
     try {
       results.value = await searchPlants(supabase, searchQuery.value);
+      hasExactMatch.value = await checkExactPlantMatch(supabase, searchQuery.value);
     } catch (error) {
       console.error('Search error:', error);
     } finally {
@@ -368,6 +469,33 @@ const quickAdd = async (name: string) => {
   }
 };
 
+const quickAddById = async (plant: Plant) => {
+  try {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) {
+      showToast('Please sign in first', 'error');
+      return;
+    }
+
+    const week = await ensureCurrentWeek(supabase, session.user.id);
+    const response = await addPlantToWeek(supabase, week.id, { plant_id: plant.id });
+
+    if (!response.success) {
+      showToast(response.error || 'Failed to add plant', 'error');
+      return;
+    }
+
+    showToast(`Added ${plant.name}!`, 'success');
+    window.dispatchEvent(new CustomEvent('plant-added'));
+    closeModal();
+  } catch (error) {
+    console.error('Quick add by ID error:', error);
+    showToast('Failed to add plant', 'error');
+  }
+};
+
 const addCustomPlant = async () => {
   if (!searchQuery.value.trim()) return;
 
@@ -440,10 +568,37 @@ const addCustomPlant = async () => {
 
     showToast(`Added ${newPlant.name}!`, 'success');
     window.dispatchEvent(new CustomEvent('plant-added'));
+    await Promise.all([loadUserCustomPlants(), loadRecommendedPlants()]); // Refresh lists
     closeModal();
   } catch (error) {
     console.error('Add custom plant error:', error);
     showToast('Failed to add custom plant', 'error');
+  }
+};
+
+const loadUserCustomPlants = async () => {
+  try {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) return;
+
+    userCustomPlants.value = await getUserCustomPlants(supabase, session.user.id, 30);
+  } catch (error) {
+    console.error('Error loading user custom plants:', error);
+  }
+};
+
+const loadRecommendedPlants = async () => {
+  try {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) return;
+
+    recommendedPlants.value = await getRecommendedPlants(supabase, session.user.id, 15);
+  } catch (error) {
+    console.error('Error loading recommended plants:', error);
   }
 };
 

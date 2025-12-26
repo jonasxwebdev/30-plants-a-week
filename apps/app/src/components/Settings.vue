@@ -1,51 +1,43 @@
 <template>
   <div class="space-y-6 pb-24">
     <div>
-      <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Einstellungen</h1>
-      <p class="text-sm text-slate-500 dark:text-slate-400">Passe deine Erfahrung an</p>
+      <h1 class="text-2xl font-bold text-text">Einstellungen</h1>
+      <p class="text-sm text-gray-500">Passe deine Erfahrung an</p>
     </div>
 
-    <div v-if="isLoading" class="py-12 text-center text-slate-500">
+    <div v-if="isLoading" class="py-12 text-center text-gray-500">
       Einstellungen werden geladen...
     </div>
 
     <div v-else class="space-y-6">
       <!-- Weekly Goal -->
-      <div
-        class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
-      >
-        <h2 class="mb-4 text-lg font-semibold text-slate-900 dark:text-white">
-          Wöchentliches Ziel
-        </h2>
+      <div class="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
+        <h2 class="mb-4 text-lg font-semibold text-text">Wöchentliches Ziel</h2>
 
         <div class="space-y-6">
           <div>
             <div class="mb-2 flex items-center justify-between">
-              <label class="text-sm font-medium text-slate-700 dark:text-slate-300"
-                >Pflanzen pro Woche</label
-              >
-              <span class="text-2xl font-bold text-primary-600 dark:text-primary-400">{{
-                goal
-              }}</span>
+              <label class="text-sm font-medium text-gray-700">Pflanzen pro Woche</label>
+              <span class="text-2xl font-bold text-primary">{{ goal }}</span>
             </div>
             <input
               type="range"
               v-model.number="goal"
               min="1"
               max="100"
-              class="h-2 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-primary-600 dark:bg-slate-700"
+              class="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-primary"
             />
-            <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+            <p class="mt-2 text-xs text-gray-500">
               Empfohlen: 30 Pflanzen pro Woche für optimale Darmgesundheit.
             </p>
           </div>
 
-          <div class="flex items-start gap-3 rounded-lg bg-slate-50 p-3 dark:bg-slate-900">
+          <div class="flex items-start gap-3 rounded-lg bg-gray-50 p-3">
             <input
               type="checkbox"
               v-model="applyToCurrentWeek"
               id="apply-current"
-              class="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500 dark:border-slate-600 dark:bg-slate-700"
+              class="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
             />
             <label for="apply-current" class="flex-1 cursor-pointer">
               <span class="block text-sm font-medium text-slate-900 dark:text-white"
@@ -57,26 +49,28 @@
             </label>
           </div>
 
-          <button
+          <motion.button
             @click="saveGoal"
             :disabled="isSaving"
-            class="w-full rounded-xl bg-primary-600 px-4 py-3 font-medium text-white transition-colors hover:bg-primary-700 disabled:opacity-50"
+            class="w-full rounded-xl bg-primary px-4 py-3 font-medium text-white transition-all hover:bg-primary/90 disabled:opacity-50 shadow-lg shadow-primary/30"
+            :whileHover="{ y: -2 }"
+            :whileTap="{ scale: 0.95 }"
           >
             {{ isSaving ? 'Speichern...' : 'Ziel speichern' }}
-          </button>
+          </motion.button>
         </div>
       </div>
 
       <!-- Data Management -->
-      <div
-        class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
-      >
-        <h2 class="mb-4 text-lg font-semibold text-slate-900 dark:text-white">Daten</h2>
-        <button
+      <div class="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
+        <h2 class="mb-4 text-lg font-semibold text-text">Daten</h2>
+        <motion.button
           @click="exportData"
-          class="flex w-full items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-left transition-colors hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-600"
+          class="flex w-full items-center justify-between rounded-xl bg-gray-50 px-4 py-3 text-left transition-all hover:bg-gray-100"
+          :whileHover="{ y: -2 }"
+          :whileTap="{ scale: 0.95 }"
         >
-          <span class="font-medium text-slate-900 dark:text-white">Meine Daten exportieren</span>
+          <span class="font-medium text-text">Meine Daten exportieren</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"
@@ -87,26 +81,26 @@
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="text-slate-400"
+            class="text-gray-400"
           >
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="7 10 12 15 17 10" />
             <line x1="12" y1="15" x2="12" y2="3" />
           </svg>
-        </button>
+        </motion.button>
       </div>
 
       <!-- Account -->
-      <div
-        class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
-      >
-        <h2 class="mb-4 text-lg font-semibold text-slate-900 dark:text-white">Konto</h2>
-        <button
+      <div class="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
+        <h2 class="mb-4 text-lg font-semibold text-text">Konto</h2>
+        <motion.button
           @click="handleSignOut"
-          class="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3 font-medium text-red-600 transition-colors hover:bg-red-100 dark:border-red-900/30 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30"
+          class="w-full rounded-xl border border-red-100 bg-red-50 px-4 py-3 font-medium text-red-600 transition-all hover:bg-red-100"
+          :whileHover="{ y: -2 }"
+          :whileTap="{ scale: 0.95 }"
         >
           Abmelden
-        </button>
+        </motion.button>
       </div>
     </div>
 
@@ -122,11 +116,7 @@
       <div
         v-if="toast.show"
         class="fixed bottom-24 left-4 right-4 z-50 flex items-center gap-3 rounded-xl p-4 shadow-lg"
-        :class="
-          toast.type === 'success'
-            ? 'bg-emerald-50 text-emerald-900 dark:bg-emerald-900/90 dark:text-emerald-100'
-            : 'bg-red-50 text-red-900 dark:bg-red-900/90 dark:text-red-100'
-        "
+        :class="toast.type === 'success' ? 'bg-primary/10 text-primary' : 'bg-red-50 text-red-900'"
       >
         <span class="text-xl">{{ toast.type === 'success' ? '🎉' : '⚠️' }}</span>
         <p class="font-medium">{{ toast.message }}</p>
@@ -137,6 +127,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { motion } from 'motion-v';
 import { createBrowserClient } from '../lib/supabase';
 import { getProfile, updateProfile, ensureCurrentWeek, updateWeekGoal } from '../lib/db';
 import { authManager } from '../lib/authClient';
