@@ -8,6 +8,57 @@
     <div v-if="isLoading" class="py-12 text-center text-gray-500">Profil wird geladen...</div>
 
     <div v-else class="space-y-6">
+      <!-- Weekly Goal -->
+      <div class="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
+        <h2 class="mb-4 text-lg font-semibold text-text">Wöchentliches Ziel</h2>
+
+        <div class="space-y-6">
+          <div>
+            <div class="mb-2 flex items-center justify-between">
+              <label class="text-sm font-medium text-gray-700">Pflanzen pro Woche</label>
+              <span class="text-2xl font-bold text-primary">{{ goal }}</span>
+            </div>
+            <input
+              type="range"
+              v-model.number="goal"
+              min="1"
+              max="100"
+              class="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-primary"
+            />
+            <p class="mt-2 text-xs text-gray-500">
+              Empfohlen: 30 Pflanzen pro Woche für optimale Darmgesundheit.
+            </p>
+          </div>
+
+          <div class="flex items-start gap-3 rounded-lg bg-gray-50 p-3">
+            <input
+              type="checkbox"
+              v-model="applyToCurrentWeek"
+              id="apply-current"
+              class="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+            />
+            <label for="apply-current" class="flex-1 cursor-pointer">
+              <span class="block text-sm font-medium text-slate-900"
+                >Auf aktuelle Woche anwenden</span
+              >
+              <span class="block text-xs text-slate-500">
+                Ändere dein Ziel für diese Woche sofort.
+              </span>
+            </label>
+          </div>
+
+          <motion.button
+            @click="saveGoal"
+            :disabled="isSaving"
+            class="w-full rounded-xl bg-primary px-4 py-3 font-medium text-white transition-all hover:bg-primary/90 disabled:opacity-50 shadow-lg shadow-primary/30"
+            :whileHover="{ y: -2 }"
+            :whileTap="{ scale: 0.95 }"
+          >
+            {{ isSaving ? 'Speichern...' : 'Ziel speichern' }}
+          </motion.button>
+        </div>
+      </div>
+
       <!-- Username -->
       <div class="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
         <h2 class="mb-4 text-lg font-semibold text-text">Benutzername</h2>
@@ -138,57 +189,6 @@
               {{ isSavingUsername ? 'Speichern...' : 'Speichern' }}
             </motion.button>
           </div>
-        </div>
-      </div>
-
-      <!-- Weekly Goal -->
-      <div class="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
-        <h2 class="mb-4 text-lg font-semibold text-text">Wöchentliches Ziel</h2>
-
-        <div class="space-y-6">
-          <div>
-            <div class="mb-2 flex items-center justify-between">
-              <label class="text-sm font-medium text-gray-700">Pflanzen pro Woche</label>
-              <span class="text-2xl font-bold text-primary">{{ goal }}</span>
-            </div>
-            <input
-              type="range"
-              v-model.number="goal"
-              min="1"
-              max="100"
-              class="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-primary"
-            />
-            <p class="mt-2 text-xs text-gray-500">
-              Empfohlen: 30 Pflanzen pro Woche für optimale Darmgesundheit.
-            </p>
-          </div>
-
-          <div class="flex items-start gap-3 rounded-lg bg-gray-50 p-3">
-            <input
-              type="checkbox"
-              v-model="applyToCurrentWeek"
-              id="apply-current"
-              class="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-            />
-            <label for="apply-current" class="flex-1 cursor-pointer">
-              <span class="block text-sm font-medium text-slate-900"
-                >Auf aktuelle Woche anwenden</span
-              >
-              <span class="block text-xs text-slate-500">
-                Ändere dein Ziel für diese Woche sofort.
-              </span>
-            </label>
-          </div>
-
-          <motion.button
-            @click="saveGoal"
-            :disabled="isSaving"
-            class="w-full rounded-xl bg-primary px-4 py-3 font-medium text-white transition-all hover:bg-primary/90 disabled:opacity-50 shadow-lg shadow-primary/30"
-            :whileHover="{ y: -2 }"
-            :whileTap="{ scale: 0.95 }"
-          >
-            {{ isSaving ? 'Speichern...' : 'Ziel speichern' }}
-          </motion.button>
         </div>
       </div>
 
