@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-text">Tracker</h1>
+        <h1 class="text-2xl font-bold text-text">Hallo, {{ userName }}</h1>
         <p class="text-sm text-gray-500">{{ weekRange }}</p>
       </div>
       <div class="flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1 text-orange-600">
@@ -13,34 +13,7 @@
     </div>
 
     <!-- Hero Ring -->
-    <div class="relative mx-auto flex h-64 w-64 items-center justify-center">
-      <!-- Background Circle -->
-      <svg class="absolute inset-0 h-full w-full -rotate-90 transform">
-        <circle
-          cx="128"
-          cy="128"
-          r="110"
-          stroke="currentColor"
-          stroke-width="24"
-          fill="none"
-          class="text-gray-100"
-        />
-        <!-- Progress Circle -->
-        <circle
-          cx="128"
-          cy="128"
-          r="110"
-          stroke="currentColor"
-          stroke-width="24"
-          fill="none"
-          stroke-linecap="round"
-          class="text-primary transition-all duration-1000 ease-out"
-          :stroke-dasharray="circumference"
-          :stroke-dashoffset="dashOffset"
-        />
-      </svg>
-
-      <!-- Center Content -->
+    <ProgressRing :value="uniqueCount" :max="goal" :size="256" class="mx-auto">
       <div class="text-center">
         <div class="text-5xl font-bold text-text">{{ uniqueCount }}</div>
         <div class="text-sm font-medium text-gray-500">von {{ goal }} Pflanzen</div>
@@ -48,22 +21,20 @@
           {{ plantsLeft > 0 ? `Noch ${plantsLeft}!` : 'Ziel erreicht! 🎉' }}
         </div>
       </div>
-    </div>
+    </ProgressRing>
 
     <!-- Plant List -->
     <div>
       <h2 class="mb-4 text-lg font-semibold text-text">Pflanzen dieser Woche</h2>
 
-      <div v-if="isLoading" class="py-8 text-center text-gray-500">Laden...</div>
+      <LoadingSpinner v-if="isLoading" message="Laden..." />
 
-      <div
+      <EmptyState
         v-else-if="plants.length === 0"
-        class="flex flex-col items-center justify-center rounded-3xl bg-gray-50 py-12 text-center"
-      >
-        <div class="mb-4 text-4xl opacity-50">🥗</div>
-        <h3 class="text-lg font-medium text-text">Schale leer?</h3>
-        <p class="text-sm text-gray-500">Füge deine erste Pflanze hinzu!</p>
-      </div>
+        icon="🥗"
+        title="Schale leer?"
+        description="Füge deine erste Pflanze hinzu!"
+      />
 
       <div v-else class="space-y-2">
         <AnimatePresence>
@@ -118,53 +89,34 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <AnimatePresence>
-      <motion.div
-        v-if="showDeleteModal"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4"
-        :initial="{ opacity: 0 }"
-        :animate="{ opacity: 1 }"
-        :exit="{ opacity: 0 }"
-      >
-        <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" @click="cancelDelete"></div>
-
-        <!-- Modal -->
-        <motion.div
-          class="relative w-full max-w-sm overflow-hidden rounded-3xl bg-white p-6 shadow-xl"
-          :initial="{ scale: 0.9, opacity: 0 }"
-          :animate="{ scale: 1, opacity: 1 }"
-          :exit="{ scale: 0.9, opacity: 0 }"
+    <Modal :show="showDeleteModal" @close="cancelDelete">
+      <div class="text-center">
+        <div
+          class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-2xl"
         >
-          <div class="mb-6 text-center">
-            <div
-              class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-2xl"
-            >
-              🗑️
-            </div>
-            <h3 class="mb-2 text-lg font-bold text-text">Pflanze entfernen?</h3>
-            <p class="text-sm text-gray-500">
-              Möchtest du "{{ plantToDelete?.name }}" wirklich von deiner Liste entfernen?
-            </p>
-          </div>
+          🗑️
+        </div>
+        <h3 class="mb-2 text-lg font-bold text-text">Pflanze entfernen?</h3>
+        <p class="text-sm text-gray-500 mb-6">
+          Möchtest du "{{ plantToDelete?.name }}" wirklich von deiner Liste entfernen?
+        </p>
 
-          <div class="flex gap-3">
-            <button
-              @click="cancelDelete"
-              class="flex-1 rounded-xl bg-gray-50 py-3 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-100"
-            >
-              Abbrechen
-            </button>
-            <button
-              @click="confirmDelete"
-              class="flex-1 rounded-xl bg-red-500 py-3 text-sm font-bold text-white shadow-lg shadow-red-200 transition-transform active:scale-95"
-            >
-              Entfernen
-            </button>
-          </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+        <div class="flex gap-3">
+          <button
+            @click="cancelDelete"
+            class="flex-1 rounded-xl bg-gray-50 py-3 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-100"
+          >
+            Abbrechen
+          </button>
+          <button
+            @click="confirmDelete"
+            class="flex-1 rounded-xl bg-red-500 py-3 text-sm font-bold text-white shadow-lg shadow-red-200 transition-transform active:scale-95"
+          >
+            Entfernen
+          </button>
+        </div>
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -181,6 +133,11 @@ import {
 } from '../lib/db';
 import { calculatePlantsLeft, formatWeekRange } from '@30-plants/shared/utils';
 import type { PlantWithDetails, Week } from '@30-plants/shared/types';
+import { getProfile } from '../lib/db';
+import ProgressRing from './ui/ProgressRing.vue';
+import LoadingSpinner from './ui/LoadingSpinner.vue';
+import EmptyState from './ui/EmptyState.vue';
+import Modal from './ui/Modal.vue';
 
 let supabase: any = null;
 const plants = ref<PlantWithDetails[]>([]);
@@ -189,10 +146,7 @@ const streak = ref(0);
 const isLoading = ref(true);
 const showDeleteModal = ref(false);
 const plantToDelete = ref<PlantWithDetails | null>(null);
-
-// Ring calculations
-const radius = 110;
-const circumference = 2 * Math.PI * radius;
+const userName = ref('');
 
 const uniqueCount = computed(() => plants.value.length);
 const goal = computed(() => currentWeek.value?.goal || 30);
@@ -200,11 +154,6 @@ const plantsLeft = computed(() => calculatePlantsLeft(uniqueCount.value, goal.va
 const weekRange = computed(() =>
   currentWeek.value ? formatWeekRange(currentWeek.value.week_start) : ''
 );
-
-const dashOffset = computed(() => {
-  const progress = Math.min(uniqueCount.value / goal.value, 1);
-  return circumference - progress * circumference;
-});
 
 const formatDate = (dateStr: string) => {
   return new Date(dateStr).toLocaleDateString('en-US', { weekday: 'short' });
@@ -218,6 +167,11 @@ const loadData = async () => {
     if (!session) return;
 
     const userId = session.user.id;
+
+    // Load user profile for name
+    const profile = await getProfile(supabase, userId);
+    userName.value = profile?.full_name || profile?.username || 'Freund';
+
     currentWeek.value = await ensureCurrentWeek(supabase, userId);
     plants.value = await listWeekPlants(supabase, currentWeek.value.id);
 

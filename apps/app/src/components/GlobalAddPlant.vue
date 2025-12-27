@@ -320,19 +320,7 @@
     </AnimatePresence>
 
     <!-- Toast Notification -->
-    <AnimatePresence>
-      <motion.div
-        v-if="toast.show"
-        class="fixed bottom-24 left-4 right-4 z-50 flex items-center gap-3 rounded-xl p-4 shadow-lg"
-        :class="toast.type === 'success' ? 'bg-primary/10 text-primary' : 'bg-red-50 text-red-900'"
-        :initial="{ opacity: 0, y: 20 }"
-        :animate="{ opacity: 1, y: 0 }"
-        :exit="{ opacity: 0, y: 20 }"
-      >
-        <span class="text-xl">{{ toast.type === 'success' ? '🎉' : '⚠️' }}</span>
-        <p class="font-medium">{{ toast.message }}</p>
-      </motion.div>
-    </AnimatePresence>
+    <Toast v-if="toast.show" :show="toast.show" :message="toast.message" :type="toast.type" />
   </div>
 </template>
 
@@ -349,6 +337,7 @@ import {
   getRecommendedPlants,
 } from '../lib/db';
 import type { AutocompleteResult, Plant } from '@30-plants/shared/types';
+import Toast from './ui/Toast.vue';
 
 let supabase: any = null;
 const isOpen = ref(false);
@@ -356,7 +345,11 @@ const searchQuery = ref('');
 const results = ref<AutocompleteResult[]>([]);
 const isLoading = ref(false);
 const searchInput = ref<HTMLInputElement | null>(null);
-const toast = ref({ show: false, message: '', type: 'success' });
+const toast = ref<{ show: boolean; message: string; type: 'success' | 'error' }>({
+  show: false,
+  message: '',
+  type: 'success',
+});
 const hasExactMatch = ref(false);
 const userCustomPlants = ref<Plant[]>([]);
 const recommendedPlants = ref<Plant[]>([]);
@@ -583,7 +576,7 @@ const loadUserCustomPlants = async () => {
     } = await supabase.auth.getSession();
     if (!session) return;
 
-    userCustomPlants.value = await getUserCustomPlants(supabase, session.user.id, 30);
+    userCustomPlants.value = await getUserCustomPlants(supabase, session.user.id, 9);
   } catch (error) {
     console.error('Error loading user custom plants:', error);
   }

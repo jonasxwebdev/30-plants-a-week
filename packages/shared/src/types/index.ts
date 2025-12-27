@@ -28,6 +28,7 @@ export interface PlantAlias {
 export interface Profile {
   id: string;
   email?: string | null;
+  username?: string | null;
   full_name?: string | null;
   avatar_url?: string | null;
   weekly_goal: number;
@@ -35,6 +36,8 @@ export interface Profile {
   timezone: string;
   notification_enabled: boolean;
   notification_time: string;
+  show_stats_to_friends?: boolean;
+  show_streak_to_friends?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -120,4 +123,48 @@ export interface AddPlantInput {
 export interface UpdateGoalInput {
   weekly_goal: number;
   apply_to_current_week?: boolean;
+}
+
+// ============================================================================
+// FRIENDS TYPES
+// ============================================================================
+
+export interface Friendship {
+  id: string;
+  user_id: string;
+  friend_id: string;
+  status: 'pending' | 'accepted' | 'rejected' | 'blocked';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FriendStats {
+  user_id: string;
+  username: string;
+  full_name?: string | null;
+  avatar_url?: string | null;
+  weekly_goal: number;
+  current_streak: number;
+  current_week_count: number;
+  current_week_goal: number;
+  total_plants_logged: number;
+  completed_weeks: number;
+}
+
+export interface FriendRequest {
+  id: string;
+  from_user: {
+    id: string;
+    username: string;
+    full_name?: string | null;
+    avatar_url?: string | null;
+  };
+  created_at: string;
+}
+
+export interface FriendProfile {
+  id: string;
+  username: string;
+  full_name?: string | null;
+  avatar_url?: string | null;
 }
