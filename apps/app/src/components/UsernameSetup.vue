@@ -174,7 +174,7 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue';
 import { motion, AnimatePresence } from 'motion-v';
-import { createBrowserClient } from '../lib/supabase';
+import { getBrowserClient } from '../lib/supabase';
 import { getProfile, updateProfile } from '../lib/db';
 
 let supabase: any = null;
@@ -305,7 +305,7 @@ async function handleSubmit() {
 }
 
 onMounted(() => {
-  supabase = createBrowserClient();
+  supabase = getBrowserClient();
   checkIfUsernameNeeded();
 
   // Re-check when user signs in

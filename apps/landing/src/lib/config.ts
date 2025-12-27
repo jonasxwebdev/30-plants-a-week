@@ -1,4 +1,4 @@
-export const PUBLIC_APP_URL = import.meta.env.PUBLIC_APP_URL || 'http://localhost:4321';
+export const PUBLIC_APP_URL = import.meta.env.PUBLIC_APP_URL || 'http://localhost:4322';
 export const PUBLIC_APP_LOGIN_PATH = import.meta.env.PUBLIC_APP_LOGIN_PATH || '/signin';
 
 export const getAppUrl = (path = '') => {

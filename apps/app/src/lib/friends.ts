@@ -5,14 +5,14 @@
 
 import type { FriendProfile, FriendRequest, FriendStats, Friendship } from '@repo/shared';
 
-import { createBrowserClient } from './supabase';
+import { getBrowserClient } from './supabase';
 
 // Create a browser client instance
 let supabase: any = null;
 
 function getClient() {
   if (!supabase) {
-    supabase = createBrowserClient();
+    supabase = getBrowserClient();
   }
   return supabase;
 }

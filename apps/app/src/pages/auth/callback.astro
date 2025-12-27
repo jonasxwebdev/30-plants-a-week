@@ -18,8 +18,6 @@ if (error) {
 }
 
 try {
-  let session;
-
   // Handle Magic Link callback (token_hash)
   if (tokenHash && type) {
     const { data, error: verifyError } = await supabase.auth.verifyOtp({
@@ -31,8 +29,6 @@ try {
       console.error('Magic link verification error:', verifyError);
       return Astro.redirect('/signin?error=' + encodeURIComponent('Failed to verify magic link'));
     }
-
-    session = data.session;
   }
   // Handle OAuth callback (code)
   else if (code) {
@@ -42,8 +38,6 @@ try {
       console.error('Code exchange error:', exchangeError);
       return Astro.redirect('/signin?error=' + encodeURIComponent('Failed to authenticate'));
     }
-
-    session = data.session;
   }
   // No valid parameters
   else {

@@ -327,7 +327,7 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted } from 'vue';
 import { motion, AnimatePresence } from 'motion-v';
-import { createBrowserClient } from '../lib/supabase';
+import { getBrowserClient } from '../lib/supabase';
 import {
   searchPlants,
   addPlantToWeek,
@@ -596,6 +596,6 @@ const loadRecommendedPlants = async () => {
 };
 
 onMounted(() => {
-  supabase = createBrowserClient();
+  supabase = getBrowserClient();
 });
 </script>

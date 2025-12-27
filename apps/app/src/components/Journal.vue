@@ -85,7 +85,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { motion, AnimatePresence } from 'motion-v';
-import { createBrowserClient } from '../lib/supabase';
+import { getBrowserClient } from '../lib/supabase';
 import { getRecentWeeks } from '../lib/db';
 import { formatWeekRange, isCurrentWeek } from '@30-plants/shared/utils';
 import type { WeekWithPlants } from '@30-plants/shared/types';
@@ -127,7 +127,7 @@ const getScoreClass = (count: number, goal: number) => {
 };
 
 onMounted(() => {
-  supabase = createBrowserClient();
+  supabase = getBrowserClient();
   loadHistory();
 });
 </script>

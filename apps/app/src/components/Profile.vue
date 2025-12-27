@@ -243,7 +243,7 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue';
 import { motion } from 'motion-v';
-import { createBrowserClient } from '../lib/supabase';
+import { getBrowserClient } from '../lib/supabase';
 import { getProfile, updateProfile, ensureCurrentWeek, updateWeekGoal } from '../lib/db';
 import { authManager } from '../lib/authClient';
 import Toast from './ui/Toast.vue';
@@ -447,7 +447,7 @@ const handleSignOut = async () => {
 };
 
 onMounted(() => {
-  supabase = createBrowserClient();
+  supabase = getBrowserClient();
   loadSettings();
 });
 </script>

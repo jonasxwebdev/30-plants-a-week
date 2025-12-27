@@ -1,7 +1,6 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
-import { createBrowserClient as createBrowserClientSSR } from '@supabase/ssr';
-import { createServerClient as createServerClientSSR } from '@supabase/ssr';
 import type { AstroCookies } from 'astro';
+import { createBrowserClient } from '@supabase/ssr';
+import { createServerClient as createServerClientSSR } from '@supabase/ssr';
 
 const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
@@ -39,15 +38,15 @@ export function createServerClient(cookies: AstroCookies, headers: Headers) {
 // Uses @supabase/ssr for proper cookie handling
 let browserClient: any = null;
 
-export function createBrowserClient() {
+export function getBrowserClient() {
   // Server-side rendering: return null or throw error
   // Browser client should only be used in browser context
   if (typeof window === 'undefined') {
-    throw new Error('createBrowserClient should only be called in browser context');
+    throw new Error('getBrowserClient should only be called in browser context');
   }
 
   if (!browserClient) {
-    browserClient = createBrowserClientSSR(supabaseUrl, supabaseAnonKey, {
+    browserClient = createBrowserClient(supabaseUrl, supabaseAnonKey, {
       cookies: {
         get(name: string) {
           const value = document.cookie

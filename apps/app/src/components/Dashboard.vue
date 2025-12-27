@@ -123,7 +123,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { motion, AnimatePresence } from 'motion-v';
-import { createBrowserClient } from '../lib/supabase';
+import { getBrowserClient } from '../lib/supabase';
 import {
   ensureCurrentWeek,
   listWeekPlants,
@@ -207,7 +207,7 @@ const confirmDelete = async () => {
 };
 
 onMounted(() => {
-  supabase = createBrowserClient();
+  supabase = getBrowserClient();
   loadData();
   window.addEventListener('plant-added', loadData);
 });

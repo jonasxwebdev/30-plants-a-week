@@ -1,4 +1,4 @@
-import { createBrowserClient, getRedirectUrl } from '../lib/supabase';
+import { getBrowserClient, getRedirectUrl } from '../lib/supabase';
 
 import type { Provider } from '@supabase/supabase-js';
 
@@ -7,7 +7,7 @@ class AuthManager {
 
   private getClient() {
     if (!this.supabase) {
-      this.supabase = createBrowserClient();
+      this.supabase = getBrowserClient();
     }
     return this.supabase;
   }
