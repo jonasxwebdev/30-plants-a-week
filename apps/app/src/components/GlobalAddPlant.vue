@@ -336,7 +336,7 @@ import {
   getUserCustomPlants,
   getRecommendedPlants,
 } from '../lib/db';
-import type { AutocompleteResult, Plant } from '@30-plants/shared/types';
+import type { AutocompleteResult, Plant } from '@repo/shared';
 import Toast from './ui/Toast.vue';
 
 let supabase: any = null;

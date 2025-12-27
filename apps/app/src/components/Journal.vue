@@ -87,8 +87,8 @@ import { ref, onMounted } from 'vue';
 import { motion, AnimatePresence } from 'motion-v';
 import { getBrowserClient } from '../lib/supabase';
 import { getRecentWeeks } from '../lib/db';
-import { formatWeekRange, isCurrentWeek } from '@30-plants/shared/utils';
-import type { WeekWithPlants } from '@30-plants/shared/types';
+import { formatWeekRange, isCurrentWeek } from '@repo/shared';
+import type { WeekWithPlants } from '@repo/shared';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 let supabase: SupabaseClient | null = null;

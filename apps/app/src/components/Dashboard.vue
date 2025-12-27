@@ -131,8 +131,8 @@ import {
   getRecentWeeks,
   calculateStreak,
 } from '../lib/db';
-import { calculatePlantsLeft, formatWeekRange } from '@30-plants/shared/utils';
-import type { PlantWithDetails, Week } from '@30-plants/shared/types';
+import { calculatePlantsLeft, formatWeekRange } from '@repo/shared';
+import type { PlantWithDetails, Week } from '@repo/shared';
 import { getProfile } from '../lib/db';
 import ProgressRing from './ui/ProgressRing.vue';
 import LoadingSpinner from './ui/LoadingSpinner.vue';
