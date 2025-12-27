@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import GlobalAddPlant from '../components/GlobalAddPlant.vue';
 import UsernameSetup from '../components/UsernameSetup.vue';
 import '../styles/global.css';
@@ -34,6 +35,8 @@ const currentPath = activeRoute || Astro.url.pathname;
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="30 Plants" />
+
+    <ClientRouter />
   </head>
   <body class="bg-background text-text pb-24">
     <main class="max-w-md mx-auto px-4 py-6 min-h-[calc(100vh-5rem)]">
