@@ -51,7 +51,7 @@ export async function searchUsersByUsername(query: string) {
     return { data: [], error: null };
   }
 
-  // Get friendship status for each user
+  // Get friendship status for each user (checking both directions)
   const userIds = profiles.map((p: any) => p.id);
   const { data: friendships } = await getClient()
     .from('friendships')
@@ -102,23 +102,33 @@ export async function sendFriendRequest(friendUsername: string) {
       return { data: null, error: new Error('Not authenticated') };
     }
 
-    // Check if friendship already exists
+    // Check if friendship already exists in either direction
     const { data: existing } = await getClient()
       .from('friendships')
-      .select('id, status')
+      .select('id, status, user_id, friend_id')
       .or(
         `and(user_id.eq.${user.id},friend_id.eq.${friend.id}),and(user_id.eq.${friend.id},friend_id.eq.${user.id})`
       )
-      .single();
+      .maybeSingle();
 
     if (existing) {
+      // Determine who is the requester
+      const isCurrentUserRequester = existing.user_id === user.id;
+      const statusMessage =
+        existing.status === 'pending'
+          ? isCurrentUserRequester
+            ? 'You already sent a friend request to this user'
+            : 'This user already sent you a friend request'
+          : `Friendship already ${existing.status}`;
+
       return {
         data: null,
-        error: new Error(`Friendship already ${existing.status}`),
+        error: new Error(statusMessage),
       };
     }
 
     // Create friendship request
+    // The database trigger will prevent duplicates
     const { data, error } = await getClient()
       .from('friendships')
       .insert({
@@ -131,6 +141,10 @@ export async function sendFriendRequest(friendUsername: string) {
 
     if (error) {
       console.error('Error sending friend request:', error);
+      // Handle duplicate friendship error from trigger
+      if (error.message?.includes('friendship already exists')) {
+        return { data: null, error: new Error('Friendship already exists') };
+      }
       return { data: null, error };
     }
 
@@ -417,6 +431,20 @@ export async function removeFriend(friendshipId: string) {
 }
 
 /**
+ * Cancel a sent friend request (delete the pending request)
+ */
+export async function cancelSentRequest(requestId: string) {
+  const { error } = await getClient().from('friendships').delete().eq('id', requestId);
+
+  if (error) {
+    console.error('Error canceling request:', error);
+    return { error };
+  }
+
+  return { error: null };
+}
+
+/**
  * Get friendship ID between current user and a friend
  */
 export async function getFriendshipId(friendId: string) {
@@ -427,6 +455,7 @@ export async function getFriendshipId(friendId: string) {
     return { data: null, error: new Error('Not authenticated') };
   }
 
+  // Check in both directions
   const { data, error } = await getClient()
     .from('friendships')
     .select('id')
@@ -434,11 +463,15 @@ export async function getFriendshipId(friendId: string) {
       `and(user_id.eq.${user.id},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${user.id})`
     )
     .eq('status', 'accepted')
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error getting friendship ID:', error);
     return { data: null, error };
+  }
+
+  if (!data) {
+    return { data: null, error: new Error('Friendship not found') };
   }
 
   return { data: data.id, error: null };

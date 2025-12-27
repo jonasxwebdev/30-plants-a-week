@@ -418,7 +418,7 @@ const selectPlant = async (result: AutocompleteResult) => {
       data: { session },
     } = await supabase.auth.getSession();
     if (!session) {
-      showToast('Please sign in first', 'error');
+      showToast('Bitte zuerst anmelden', 'error');
       return;
     }
 
@@ -426,16 +426,16 @@ const selectPlant = async (result: AutocompleteResult) => {
     const response = await addPlantToWeek(supabase, week.id, { plant_id: result.plant.id });
 
     if (!response.success) {
-      showToast(response.error || 'Failed to add plant', 'error');
+      showToast(response.error || 'Pflanze konnte nicht hinzugefügt werden', 'error');
       return;
     }
 
-    showToast(`Added ${result.plant.name}!`, 'success');
+    showToast(`${result.plant.name} hinzugefügt!`, 'success');
     window.dispatchEvent(new CustomEvent('plant-added'));
     closeModal();
   } catch (error) {
     console.error('Add error:', error);
-    showToast('Failed to add plant', 'error');
+    showToast('Pflanze konnte nicht hinzugefügt werden', 'error');
   }
 };
 
@@ -468,7 +468,7 @@ const quickAddById = async (plant: Plant) => {
       data: { session },
     } = await supabase.auth.getSession();
     if (!session) {
-      showToast('Please sign in first', 'error');
+      showToast('Bitte zuerst anmelden', 'error');
       return;
     }
 
@@ -476,16 +476,16 @@ const quickAddById = async (plant: Plant) => {
     const response = await addPlantToWeek(supabase, week.id, { plant_id: plant.id });
 
     if (!response.success) {
-      showToast(response.error || 'Failed to add plant', 'error');
+      showToast(response.error || 'Pflanze konnte nicht hinzugefügt werden', 'error');
       return;
     }
 
-    showToast(`Added ${plant.name}!`, 'success');
+    showToast(`${plant.name} hinzugefügt!`, 'success');
     window.dispatchEvent(new CustomEvent('plant-added'));
     closeModal();
   } catch (error) {
     console.error('Quick add by ID error:', error);
-    showToast('Failed to add plant', 'error');
+    showToast('Pflanze konnte nicht hinzugefügt werden', 'error');
   }
 };
 
@@ -497,7 +497,7 @@ const addCustomPlant = async () => {
       data: { session },
     } = await supabase.auth.getSession();
     if (!session) {
-      showToast('Please sign in first', 'error');
+      showToast('Bitte zuerst anmelden', 'error');
       return;
     }
 
@@ -528,7 +528,7 @@ const addCustomPlant = async () => {
           .single();
 
         if (findError || !existingPlant) {
-          showToast('Plant already exists but could not be found', 'error');
+          showToast('Pflanze existiert bereits, konnte aber nicht gefunden werden', 'error');
           return;
         }
 
@@ -537,11 +537,11 @@ const addCustomPlant = async () => {
         const response = await addPlantToWeek(supabase, week.id, { plant_id: existingPlant.id });
 
         if (!response.success) {
-          showToast(response.error || 'Failed to add plant', 'error');
+          showToast(response.error || 'Pflanze konnte nicht hinzugefügt werden', 'error');
           return;
         }
 
-        showToast(`Added ${existingPlant.name}!`, 'success');
+        showToast(`${existingPlant.name} hinzugefügt!`, 'success');
         window.dispatchEvent(new CustomEvent('plant-added'));
         closeModal();
         return;
@@ -555,17 +555,17 @@ const addCustomPlant = async () => {
     const response = await addPlantToWeek(supabase, week.id, { plant_id: newPlant.id });
 
     if (!response.success) {
-      showToast(response.error || 'Failed to add plant', 'error');
+      showToast(response.error || 'Pflanze konnte nicht hinzugefügt werden', 'error');
       return;
     }
 
-    showToast(`Added ${newPlant.name}!`, 'success');
+    showToast(`${newPlant.name} hinzugefügt!`, 'success');
     window.dispatchEvent(new CustomEvent('plant-added'));
     await Promise.all([loadUserCustomPlants(), loadRecommendedPlants()]); // Refresh lists
     closeModal();
   } catch (error) {
     console.error('Add custom plant error:', error);
-    showToast('Failed to add custom plant', 'error');
+    showToast('Pflanze konnte nicht hinzugefügt werden', 'error');
   }
 };
 
@@ -578,7 +578,7 @@ const loadUserCustomPlants = async () => {
 
     userCustomPlants.value = await getUserCustomPlants(supabase, session.user.id, 9);
   } catch (error) {
-    console.error('Error loading user custom plants:', error);
+    console.error('Fehler beim Laden der benutzerdefinierten Pflanzen:', error);
   }
 };
 
@@ -591,7 +591,7 @@ const loadRecommendedPlants = async () => {
 
     recommendedPlants.value = await getRecommendedPlants(supabase, session.user.id, 15);
   } catch (error) {
-    console.error('Error loading recommended plants:', error);
+    console.error('Fehler beim Laden der empfohlenen Pflanzen:', error);
   }
 };
 

@@ -36,10 +36,13 @@
       <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
         Ausstehende Anfragen ({{ sentRequests.length }})
       </h2>
-      <div
+      <motion.div
         v-for="(request, index) in sentRequests"
         :key="request.id"
-        class="flex items-center justify-between rounded-xl border-2 border-orange-100 bg-orange-50/50 p-4"
+        class="flex items-center justify-between rounded-xl bg-white p-4 shadow-sm border border-gray-100"
+        :initial="{ opacity: 0, y: 20 }"
+        :animate="{ opacity: 1, y: 0 }"
+        :transition="{ delay: index * 0.05 }"
       >
         <div class="flex items-center gap-3">
           <UserAvatar
@@ -53,8 +56,19 @@
             <p class="text-xs text-gray-500">{{ request.from_user.full_name || 'Kein Name' }}</p>
           </div>
         </div>
-        <div class="text-sm text-orange-600 font-medium">⏳ Wartet auf Antwort</div>
-      </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-orange-600 font-medium">⏳ Wartet</span>
+          <motion.button
+            @click="handleCancelRequest(request.id)"
+            class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
+            :whileTap="{ scale: 0.9 }"
+            title="Anfrage zurückziehen"
+            aria-label="Anfrage zurückziehen"
+          >
+            ✕
+          </motion.button>
+        </div>
+      </motion.div>
     </div>
 
     <!-- Friends List with Stats -->
@@ -203,6 +217,30 @@
         </motion.div>
       </div>
     </Modal>
+
+    <!-- Cancel Request Confirmation -->
+    <ConfirmModal
+      :show="showCancelConfirm"
+      title="Anfrage zurückziehen?"
+      :message="`Möchtest du deine Freundschaftsanfrage an @${pendingAction?.username || 'diesen Benutzer'} wirklich zurückziehen?`"
+      confirm-text="Zurückziehen"
+      cancel-text="Abbrechen"
+      variant="warning"
+      @confirm="confirmCancelRequest"
+      @cancel="showCancelConfirm = false"
+    />
+
+    <!-- Remove Friend Confirmation -->
+    <ConfirmModal
+      :show="showRemoveConfirm"
+      title="Freund entfernen?"
+      :message="`Möchtest du @${pendingAction?.username || 'diesen Freund'} wirklich entfernen? Ihr könnt euch jederzeit wieder als Freunde hinzufügen.`"
+      confirm-text="Entfernen"
+      cancel-text="Abbrechen"
+      variant="danger"
+      @confirm="confirmRemoveFriend"
+      @cancel="showRemoveConfirm = false"
+    />
   </div>
 </template>
 
@@ -220,6 +258,7 @@ import {
   rejectFriendRequest,
   getFriendshipId,
   removeFriend,
+  cancelSentRequest,
 } from '../lib/friends';
 import type { FriendProfile, FriendStats, FriendRequest } from '@repo/shared/types';
 import LoadingSpinner from './ui/LoadingSpinner.vue';
@@ -227,6 +266,7 @@ import EmptyState from './ui/EmptyState.vue';
 import FriendStatsCard from './ui/FriendStatsCard.vue';
 import FriendRequestCard from './ui/FriendRequestCard.vue';
 import Modal from './ui/Modal.vue';
+import ConfirmModal from './ui/ConfirmModal.vue';
 import UserAvatar from './ui/UserAvatar.vue';
 
 const friends = ref<FriendProfile[]>([]);
@@ -239,6 +279,11 @@ const searchQuery = ref('');
 const searchResults = ref<FriendProfile[]>([]);
 const isSearching = ref(false);
 const requestSent = ref<Record<string, boolean>>({});
+
+// Confirmation modal state
+const showCancelConfirm = ref(false);
+const showRemoveConfirm = ref(false);
+const pendingAction = ref<{ id: string; username?: string } | null>(null);
 
 let searchTimeout: NodeJS.Timeout | null = null;
 
@@ -306,6 +351,8 @@ async function handleSendRequest(username: string) {
 
   if (!error) {
     requestSent.value[user.id] = true;
+    // Reload data to show the sent request
+    await loadData();
     setTimeout(() => {
       closeAddFriendModal();
     }, 1000);
@@ -334,12 +381,43 @@ async function handleRejectRequest(requestId: string) {
   }
 }
 
-async function handleRemoveFriend(friendId: string) {
-  if (!confirm('Möchtest du diesen Freund wirklich entfernen?')) {
-    return;
-  }
+async function handleCancelRequest(requestId: string) {
+  // Find the request to get username for display
+  const request = sentRequests.value.find((r) => r.id === requestId);
+  pendingAction.value = { id: requestId, username: request?.from_user.username };
+  showCancelConfirm.value = true;
+}
 
-  const { data: friendshipId } = await getFriendshipId(friendId);
+async function confirmCancelRequest() {
+  if (!pendingAction.value) return;
+
+  const { error } = await cancelSentRequest(pendingAction.value.id);
+
+  showCancelConfirm.value = false;
+  pendingAction.value = null;
+
+  if (!error) {
+    await loadData();
+  } else {
+    alert('Fehler beim Zurückziehen der Anfrage');
+  }
+}
+
+async function handleRemoveFriend(friendId: string) {
+  // Find the friend to get username for display
+  const friend = friendsWithStats.value.find((f) => f.user_id === friendId);
+  pendingAction.value = { id: friendId, username: friend?.username };
+  showRemoveConfirm.value = true;
+}
+
+async function confirmRemoveFriend() {
+  if (!pendingAction.value) return;
+
+  const { data: friendshipId } = await getFriendshipId(pendingAction.value.id);
+
+  showRemoveConfirm.value = false;
+  const actionId = pendingAction.value.id;
+  pendingAction.value = null;
 
   if (friendshipId) {
     const { error } = await removeFriend(friendshipId);
