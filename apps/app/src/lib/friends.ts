@@ -52,7 +52,7 @@ export async function searchUsersByUsername(query: string) {
   }
 
   // Get friendship status for each user
-  const userIds = profiles.map((p) => p.id);
+  const userIds = profiles.map((p: any) => p.id);
   const { data: friendships } = await getClient()
     .from('friendships')
     .select('user_id, friend_id, status')
@@ -61,9 +61,9 @@ export async function searchUsersByUsername(query: string) {
     );
 
   // Add friendship status to profiles
-  const profilesWithStatus = profiles.map((profile) => {
+  const profilesWithStatus = profiles.map((profile: any) => {
     const friendship = friendships?.find(
-      (f) =>
+      (f: any) =>
         (f.user_id === user.id && f.friend_id === profile.id) ||
         (f.friend_id === user.id && f.user_id === profile.id)
     );
