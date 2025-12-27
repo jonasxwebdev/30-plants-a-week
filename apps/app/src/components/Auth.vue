@@ -165,8 +165,10 @@ function switchView(view: View) {
       <p class="mt-2 text-center text-sm text-gray-600">Tracke deine Darmvielfalt</p>
     </div>
 
-    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-      <div class="bg-white py-8 px-4 shadow-lg sm:rounded-3xl sm:px-10 border border-gray-100">
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md mx-2">
+      <div
+        class="bg-white py-8 px-4 shadow-lg rounded-2xl sm:rounded-3xl sm:px-10 border border-gray-100"
+      >
         <!-- Error/Success Messages -->
         <div v-if="error" class="mb-4 p-4 rounded-xl bg-red-50 text-red-700 text-sm">
           {{ error }}

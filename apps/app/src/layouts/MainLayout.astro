@@ -24,7 +24,16 @@ const currentPath = activeRoute || Astro.url.pathname;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title} - 30 Plants A Week</title>
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#62c16e" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="30 Plants" />
   </head>
   <body class="bg-background text-text pb-24">
     <main class="max-w-md mx-auto px-4 py-6 min-h-[calc(100vh-5rem)]">
