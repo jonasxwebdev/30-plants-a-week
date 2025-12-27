@@ -1,19 +1,20 @@
 ---
+import Layout from '../layouts/Layout.astro';
+import NavBar from '../components/landing/NavBar.vue';
+import Hero from '../components/landing/Hero.vue';
+import Science from '../components/landing/Science.vue';
+import Features from '../components/landing/Features.vue';
+import CallToAction from '../components/landing/CallToAction.vue';
+import Footer from '../components/landing/Footer.vue';
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>30 Plants A Week - Landing</title>
-    <meta name="description" content="Track your plant-based eating journey" />
-  </head>
-  <body>
-    <main>
-      <h1>🌱 30 Plants A Week</h1>
-      <p>Track your plant-based eating journey and hit your weekly goals.</p>
-      <a href="https://app.domain.com">Get Started</a>
-    </main>
-  </body>
-</html>
+<Layout title="30 Plants a Week - Boost Your Gut Health">
+  <main>
+    <NavBar client:load />
+    <Hero client:load />
+    <Science client:visible />
+    <Features client:visible />
+    <CallToAction client:visible />
+    <Footer />
+  </main>
+</Layout>

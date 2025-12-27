@@ -3,7 +3,7 @@
  * Handles friend requests, friendships, and stats comparison
  */
 
-import type { FriendProfile, FriendRequest, FriendStats, Friendship } from '@repo/shared/types';
+import type { FriendProfile, FriendRequest, FriendStats, Friendship } from '@repo/shared';
 
 import { createBrowserClient } from './supabase';
 
@@ -170,7 +170,7 @@ export async function getFriends() {
     }
 
     // Get friend profiles
-    const friendIds = data.map((f) => (f.user_id === user.id ? f.friend_id : f.user_id));
+    const friendIds = data.map((f: any) => (f.user_id === user.id ? f.friend_id : f.user_id));
 
     if (friendIds.length === 0) {
       return { data: [], error: null };
@@ -227,7 +227,7 @@ export async function getPendingRequests() {
     }
 
     // Get profiles of users who sent requests
-    const userIds = data.map((r) => r.user_id);
+    const userIds = data.map((r: any) => r.user_id);
     const { data: profiles, error: profilesError } = await getClient()
       .from('profiles')
       .select('id, username, full_name, avatar_url')
@@ -239,8 +239,8 @@ export async function getPendingRequests() {
     }
 
     // Map to FriendRequest format
-    const requests: FriendRequest[] = data.map((req) => {
-      const profile = profiles.find((p) => p.id === req.user_id);
+    const requests: FriendRequest[] = data.map((req: any) => {
+      const profile = profiles.find((p: any) => p.id === req.user_id);
       return {
         id: req.id,
         from_user: {

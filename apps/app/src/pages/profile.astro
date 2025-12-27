@@ -1,6 +1,6 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
-import Profile from '../components/Profile.vue';
+import ProfileComponent from '../components/Profile.vue';
 import { requireAuth } from '../lib/auth';
 
 const { redirect } = await requireAuth(Astro.cookies, Astro.request.headers);
@@ -11,5 +11,5 @@ if (redirect) {
 ---
 
 <MainLayout title="Profil" activeRoute="/profile">
-  <Profile client:load />
+  <ProfileComponent client:load />
 </MainLayout>
