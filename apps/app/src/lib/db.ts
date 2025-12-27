@@ -13,13 +13,8 @@ import type {
   Week,
   WeekPlant,
   WeekWithPlants,
-} from '@30-plants/shared/types';
-import {
-  calculateProgress,
-  getWeekEndDate,
-  getWeekStartDate,
-  isWeekCompleted,
-} from '@30-plants/shared/utils';
+} from '@repo/shared';
+import { calculateProgress, getWeekEndDate, getWeekStartDate, isWeekCompleted } from '@repo/shared';
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 
