@@ -31,6 +31,32 @@
       </AnimatePresence>
     </div>
 
+    <!-- Sent Requests (Ausstehend) -->
+    <div v-if="sentRequests.length > 0" class="space-y-3">
+      <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+        Ausstehende Anfragen ({{ sentRequests.length }})
+      </h2>
+      <div
+        v-for="(request, index) in sentRequests"
+        :key="request.id"
+        class="flex items-center justify-between rounded-xl border-2 border-orange-100 bg-orange-50/50 p-4"
+      >
+        <div class="flex items-center gap-3">
+          <UserAvatar
+            :avatar-url="request.from_user.avatar_url"
+            :username="request.from_user.username"
+            :name="request.from_user.full_name"
+            size="md"
+          />
+          <div>
+            <p class="font-semibold text-text">@{{ request.from_user.username }}</p>
+            <p class="text-xs text-gray-500">{{ request.from_user.full_name || 'Kein Name' }}</p>
+          </div>
+        </div>
+        <div class="text-sm text-orange-600 font-medium">⏳ Wartet auf Antwort</div>
+      </div>
+    </div>
+
     <!-- Friends List with Stats -->
     <div class="space-y-3">
       <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
@@ -145,7 +171,10 @@
               <p class="text-xs text-gray-500">{{ user.full_name || 'Kein Name' }}</p>
             </div>
           </div>
+
+          <!-- Status anzeigen basierend auf Freundschaftsstatus -->
           <motion.button
+            v-if="!user.friendshipStatus"
             @click="handleSendRequest(user.username)"
             class="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors"
             :whileTap="{ scale: 0.95 }"
@@ -153,6 +182,24 @@
           >
             {{ requestSent[user.id] ? '✓ Gesendet' : 'Anfragen' }}
           </motion.button>
+
+          <div v-else-if="user.friendshipStatus === 'pending'" class="text-sm">
+            <span v-if="user.isRequester" class="text-orange-600 font-medium"
+              >⏳ Anfrage ausstehend</span
+            >
+            <span v-else class="text-blue-600 font-medium">📩 Möchte dein Freund sein</span>
+          </div>
+
+          <div
+            v-else-if="user.friendshipStatus === 'accepted'"
+            class="text-sm text-green-600 font-medium"
+          >
+            ✓ Bereits Freunde
+          </div>
+
+          <div v-else-if="user.friendshipStatus === 'rejected'" class="text-sm text-gray-500">
+            Abgelehnt
+          </div>
         </motion.div>
       </div>
     </Modal>
@@ -165,6 +212,7 @@ import { motion, AnimatePresence } from 'motion-v';
 import {
   getFriends,
   getPendingRequests,
+  getSentRequests,
   getFriendStats,
   searchUsersByUsername,
   sendFriendRequest,
@@ -184,6 +232,7 @@ import UserAvatar from './ui/UserAvatar.vue';
 const friends = ref<FriendProfile[]>([]);
 const friendsWithStats = ref<FriendStats[]>([]);
 const pendingRequests = ref<FriendRequest[]>([]);
+const sentRequests = ref<FriendRequest[]>([]);
 const isLoading = ref(true);
 const showAddFriend = ref(false);
 const searchQuery = ref('');
@@ -212,6 +261,10 @@ async function loadData() {
 
     // Load pending requests
     const { data: requestsData } = await getPendingRequests();
+
+    // Load sent requests
+    const { data: sentData } = await getSentRequests();
+    sentRequests.value = sentData || [];
     pendingRequests.value = requestsData || [];
   } catch (error) {
     console.error('Error loading friends data:', error);

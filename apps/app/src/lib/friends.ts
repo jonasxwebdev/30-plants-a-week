@@ -18,22 +18,64 @@ function getClient() {
 }
 
 /**
- * Search for users by username
+ * Search for users by username with friendship status
  */
 export async function searchUsersByUsername(query: string) {
-  const { data, error } = await getClient()
+  // Get current user
+  const {
+    data: { user },
+  } = await getClient().auth.getUser();
+
+  if (!user) {
+    return { data: null, error: new Error('Not authenticated') };
+  }
+
+  const queryBuilder = getClient()
     .from('profiles')
     .select('id, username, full_name, avatar_url')
     .ilike('username', `%${query}%`)
     .not('username', 'is', null)
     .limit(10);
 
+  // Exclude current user from results
+  queryBuilder.neq('id', user.id);
+
+  const { data: profiles, error } = await queryBuilder;
+
   if (error) {
     console.error('Error searching users:', error);
     return { data: null, error };
   }
 
-  return { data: data as FriendProfile[], error: null };
+  if (!profiles || profiles.length === 0) {
+    return { data: [], error: null };
+  }
+
+  // Get friendship status for each user
+  const userIds = profiles.map((p) => p.id);
+  const { data: friendships } = await getClient()
+    .from('friendships')
+    .select('user_id, friend_id, status')
+    .or(
+      `and(user_id.eq.${user.id},friend_id.in.(${userIds.join(',')})),and(friend_id.eq.${user.id},user_id.in.(${userIds.join(',')}))`
+    );
+
+  // Add friendship status to profiles
+  const profilesWithStatus = profiles.map((profile) => {
+    const friendship = friendships?.find(
+      (f) =>
+        (f.user_id === user.id && f.friend_id === profile.id) ||
+        (f.friend_id === user.id && f.user_id === profile.id)
+    );
+
+    return {
+      ...profile,
+      friendshipStatus: friendship?.status || null,
+      isRequester: friendship?.user_id === user.id,
+    };
+  });
+
+  return { data: profilesWithStatus, error: null };
 }
 
 /**
@@ -205,6 +247,8 @@ export async function getPendingRequests() {
       return { data: null, error: new Error('Not authenticated') };
     }
 
+    console.log('Current user ID:', user.id);
+
     const { data, error } = await getClient()
       .from('friendships')
       .select(
@@ -222,6 +266,8 @@ export async function getPendingRequests() {
       return { data: null, error };
     }
 
+    console.log('Pending friendships found (where I am friend_id):', data);
+
     if (data.length === 0) {
       return { data: [], error: null };
     }
@@ -238,6 +284,8 @@ export async function getPendingRequests() {
       return { data: null, error: profilesError };
     }
 
+    console.log('Profiles found:', profiles);
+
     // Map to FriendRequest format
     const requests: FriendRequest[] = data.map((req: any) => {
       const profile = profiles.find((p: any) => p.id === req.user_id);
@@ -245,7 +293,80 @@ export async function getPendingRequests() {
         id: req.id,
         from_user: {
           id: req.user_id,
-          username: profile?.username || '',
+          username: profile?.username || 'unknown',
+          full_name: profile?.full_name,
+          avatar_url: profile?.avatar_url,
+        },
+        created_at: req.created_at,
+      };
+    });
+
+    console.log('Mapped requests:', requests);
+
+    return { data: requests, error: null };
+  } catch (err) {
+    console.error('Error in getPendingRequests:', err);
+    return { data: null, error: err as Error };
+  }
+}
+
+/**
+ * Get sent friend requests that are still pending (where current user is the sender)
+ */
+export async function getSentRequests() {
+  try {
+    const {
+      data: { user },
+    } = await getClient().auth.getUser();
+    if (!user) {
+      return { data: null, error: new Error('Not authenticated') };
+    }
+
+    const { data, error } = await getClient()
+      .from('friendships')
+      .select(
+        `
+        id,
+        friend_id,
+        created_at
+      `
+      )
+      .eq('user_id', user.id)
+      .eq('status', 'pending');
+
+    if (error) {
+      console.error('Error getting sent requests:', error);
+      return { data: null, error };
+    }
+
+    console.log('Sent pending requests:', data);
+
+    if (!data || data.length === 0) {
+      return { data: [], error: null };
+    }
+
+    // Get profiles of users to whom requests were sent
+    const friendIds = data.map((r: any) => r.friend_id);
+    const { data: profiles, error: profilesError } = await getClient()
+      .from('profiles')
+      .select('id, username, full_name, avatar_url')
+      .in('id', friendIds);
+
+    if (profilesError) {
+      console.error('Error getting recipient profiles:', profilesError);
+      return { data: null, error: profilesError };
+    }
+
+    console.log('Profiles found:', profiles);
+
+    // Map to FriendRequest format
+    const requests: FriendRequest[] = data.map((req: any) => {
+      const profile = profiles?.find((p: any) => p.id === req.friend_id);
+      return {
+        id: req.id,
+        from_user: {
+          id: req.friend_id,
+          username: profile?.username || 'unknown',
           full_name: profile?.full_name,
           avatar_url: profile?.avatar_url,
         },
@@ -255,7 +376,7 @@ export async function getPendingRequests() {
 
     return { data: requests, error: null };
   } catch (err) {
-    console.error('Error in getPendingRequests:', err);
+    console.error('Error in getSentRequests:', err);
     return { data: null, error: err as Error };
   }
 }

@@ -1,80 +1,121 @@
 <template>
-  <section id="science" class="py-20 bg-white relative">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid lg:grid-cols-2 gap-12 items-center">
+  <section id="science" class="py-16 sm:py-24 lg:py-32 bg-white relative overflow-hidden">
+    <!-- Subtle background pattern -->
+    <div class="absolute inset-0 opacity-[0.03]">
+      <div class="absolute inset-0 bg-grain"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+      <div class="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
         <motion.div
-          :initial="{ opacity: 0, x: -20 }"
+          :initial="{ opacity: 0, x: -30 }"
           :whileInView="{ opacity: 1, x: 0 }"
           :viewport="{ once: true }"
-          :transition="{ duration: 0.6 }"
+          :transition="{ duration: 0.7, ease: 'easeOut' }"
         >
-          <h2 class="text-3xl sm:text-4xl font-serif font-bold text-text mb-6">Why 30 Plants?</h2>
-          <p class="text-lg text-text-muted mb-8 leading-relaxed">
-            Research suggests that people who eat at least 30 different types of plants per week
-            have more diverse gut microbiomes than those who eat 10 or fewer.
-          </p>
-
-          <ul class="space-y-6">
-            <li v-for="(point, index) in points" :key="index" class="flex gap-4">
-              <div
-                class="flex-shrink-0 w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-secondary font-bold"
-              >
-                {{ index + 1 }}
-              </div>
-              <div>
-                <h3 class="font-bold text-text mb-1">{{ point.title }}</h3>
-                <p class="text-text-muted">{{ point.desc }}</p>
-              </div>
-            </li>
-          </ul>
-
-          <div class="mt-8 p-4 bg-gray-50 rounded-xl border border-gray-100">
-            <p class="text-xs text-gray-500 italic">
-              Note: This is for educational purposes and tracking dietary variety, not medical
-              advice.
+          <div class="mb-6">
+            <span
+              class="inline-block text-primary-600 font-semibold text-sm tracking-wide uppercase mb-4"
+            >
+              Die Wissenschaft
+            </span>
+            <h2
+              class="text-3xl sm:text-4xl lg:text-5xl font-serif text-neutral-900 mb-4 sm:mb-6 leading-tight"
+            >
+              Warum 30 Verschiedene Pflanzen?
+            </h2>
+            <p class="text-base sm:text-lg lg:text-xl text-neutral-600 leading-relaxed">
+              Forschung des American Gut Project zeigt, dass Menschen, die mindestens
+              <strong class="text-neutral-900">30 verschiedene Pflanzen pro Woche</strong>
+              essen, ein deutlich vielfältigeres Darmmikrobiom haben als jene, die 10 oder weniger
+              essen.
             </p>
+          </div>
+
+          <div class="space-y-5 sm:space-y-6 mt-8 sm:mt-10">
+            <div v-for="(point, index) in points" :key="index" class="group">
+              <motion.div
+                class="flex gap-5"
+                :initial="{ opacity: 0, x: -20 }"
+                :whileInView="{ opacity: 1, x: 0 }"
+                :viewport="{ once: true }"
+                :transition="{ duration: 0.5, delay: index * 0.1 }"
+              >
+                <div
+                  class="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center text-primary-700 font-bold text-base sm:text-lg shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-300"
+                >
+                  {{ point.icon }}
+                </div>
+                <div>
+                  <h3 class="font-semibold text-neutral-900 mb-1.5 sm:mb-2 text-base sm:text-lg">
+                    {{ point.title }}
+                  </h3>
+                  <p class="text-sm sm:text-base text-neutral-600 leading-relaxed">
+                    {{ point.desc }}
+                  </p>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+
+          <div
+            class="mt-8 sm:mt-10 p-4 sm:p-5 bg-amber-50 rounded-xl sm:rounded-2xl border border-amber-200"
+          >
+            <div class="flex gap-2 sm:gap-3">
+              <span class="text-xl sm:text-2xl">💡</span>
+              <p class="text-xs sm:text-sm text-amber-900 leading-relaxed">
+                <strong>Wichtig:</strong> Diese App dient zu Bildungszwecken und zum Tracking der
+                Ernährungsvielfalt. Konsultiere bei gesundheitlichen Fragen immer medizinisches
+                Fachpersonal.
+              </p>
+            </div>
           </div>
         </motion.div>
 
         <motion.div
-          class="relative"
-          :initial="{ opacity: 0, scale: 0.9 }"
+          class="relative hidden lg:block"
+          :initial="{ opacity: 0, scale: 0.95 }"
           :whileInView="{ opacity: 1, scale: 1 }"
           :viewport="{ once: true }"
-          :transition="{ duration: 0.6, delay: 0.2 }"
+          :transition="{ duration: 0.7, delay: 0.2 }"
         >
-          <div
-            class="aspect-square rounded-3xl bg-gradient-to-br from-green-50 to-orange-50 p-8 flex items-center justify-center relative overflow-hidden"
-          >
-            <div class="absolute inset-0 bg-grain opacity-20"></div>
-            <div class="grid grid-cols-2 gap-4 w-full max-w-md">
-              <div
-                class="bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center transform translate-y-8"
-              >
-                <span class="text-4xl mb-2">🥦</span>
-                <span class="font-bold text-text">Fiber</span>
-                <span class="text-xs text-gray-500">Fuel for gut bacteria</span>
+          <div class="relative">
+            <!-- Main visual card -->
+            <div
+              class="aspect-square rounded-3xl bg-gradient-to-br from-primary-100 via-primary-50 to-accent-100 p-8 flex items-center justify-center relative overflow-hidden shadow-2xl"
+            >
+              <div class="absolute inset-0 bg-grain opacity-20"></div>
+
+              <!-- Grid of benefit cards -->
+              <div class="grid grid-cols-2 gap-4 w-full max-w-md relative z-10">
+                <div
+                  v-for="(benefit, index) in benefits"
+                  :key="index"
+                  class="bg-white p-6 rounded-2xl shadow-lg flex flex-col items-center text-center hover:scale-105 hover:shadow-xl transition-all duration-300"
+                  :class="index % 2 === 0 ? 'transform translate-y-4' : ''"
+                >
+                  <span class="text-5xl mb-3">{{ benefit.emoji }}</span>
+                  <span class="font-bold text-neutral-900 text-sm mb-1">{{ benefit.title }}</span>
+                  <span class="text-xs text-neutral-500">{{ benefit.subtitle }}</span>
+                </div>
               </div>
+
+              <!-- Decorative elements -->
               <div
-                class="bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center"
-              >
-                <span class="text-4xl mb-2">🫐</span>
-                <span class="font-bold text-text">Polyphenols</span>
-                <span class="text-xs text-gray-500">Antioxidant power</span>
-              </div>
+                class="absolute top-4 right-4 w-20 h-20 bg-primary-200 rounded-full opacity-20 blur-2xl"
+              ></div>
               <div
-                class="bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center"
-              >
-                <span class="text-4xl mb-2">🥜</span>
-                <span class="font-bold text-text">Diversity</span>
-                <span class="text-xs text-gray-500">Resilient microbiome</span>
-              </div>
-              <div
-                class="bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center text-center transform translate-y-8"
-              >
-                <span class="text-4xl mb-2">🥑</span>
-                <span class="font-bold text-text">Health</span>
-                <span class="text-xs text-gray-500">Overall wellbeing</span>
+                class="absolute bottom-4 left-4 w-24 h-24 bg-accent-200 rounded-full opacity-20 blur-2xl"
+              ></div>
+            </div>
+
+            <!-- Floating stat badge -->
+            <div
+              class="absolute -top-6 -right-6 bg-white rounded-2xl shadow-xl p-4 border-2 border-primary-100"
+            >
+              <div class="text-center">
+                <div class="text-3xl font-bold text-primary-600">30+</div>
+                <div class="text-xs text-neutral-600 font-medium">Pflanzensorten</div>
               </div>
             </div>
           </div>
@@ -89,16 +130,26 @@ import { motion } from 'motion-v';
 
 const points = [
   {
-    title: 'Diverse Fiber Sources',
-    desc: 'Different plants contain different types of fiber and prebiotics that feed different gut bacteria.',
+    icon: '🌾',
+    title: 'Vielfältige Ballaststoffquellen',
+    desc: 'Verschiedene Pflanzen enthalten einzigartige Ballaststoffe und Präbiotika, die unterschiedliche nützliche Darmbakterien ernähren.',
   },
   {
-    title: 'Polyphenol Variety',
-    desc: 'Colorful plants provide a wide range of antioxidants and protective compounds.',
+    icon: '🎨',
+    title: 'Polyphenol-Vielfalt',
+    desc: 'Farbenfrohe Pflanzen liefern ein breites Spektrum an Antioxidantien und schützenden Verbindungen für die Gesundheit.',
   },
   {
-    title: 'Diversity Over Perfection',
-    desc: 'Focus on adding new foods rather than restricting what you eat.',
+    icon: '✨',
+    title: 'Vielfalt statt Perfektion',
+    desc: 'Fokus auf Abwechslung statt Einschränkung – kleine Ergänzungen haben große Wirkung.',
   },
+];
+
+const benefits = [
+  { emoji: '🥦', title: 'Ballaststoffe', subtitle: 'Ernährt Bakterien' },
+  { emoji: '🫐', title: 'Antioxidantien', subtitle: 'Schützt Zellen' },
+  { emoji: '🥜', title: 'Mikrobiom', subtitle: 'Vielfalt aufbauen' },
+  { emoji: '🥑', title: 'Gesundheit', subtitle: 'Ganzheitlich' },
 ];
 </script>

@@ -16,8 +16,8 @@
           size="lg"
         />
         <div>
-          <p class="font-bold text-text">@{{ friend.username }}</p>
-          <p class="text-xs text-gray-500">{{ friend.full_name || 'Kein Name' }}</p>
+          <p class="font-bold text-text">{{ friend.full_name || 'Anonym' }}</p>
+          <p class="text-xs text-gray-500">@{{ friend.username }}</p>
         </div>
       </div>
 
@@ -39,7 +39,7 @@
     </div>
 
     <!-- Stats Comparison Grid -->
-    <div class="grid grid-cols-3 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
       <!-- Current Week -->
       <div class="bg-gradient-to-br from-primary/5 to-primary/10 rounded-xl p-3 text-center">
         <p class="text-[10px] font-medium text-gray-600 uppercase tracking-wide mb-1">
